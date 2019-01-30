@@ -25,7 +25,7 @@ from pprint import pprint
 import time
 import sys
 print("Imports Completed")
-
+import math
 download('punkt')
 
 #######################################################################################################################
@@ -222,6 +222,7 @@ def split_sentence(sentence):
     tokenizer = RegexpTokenizer(pattern=PATTERN) 
     return tokenizer.tokenize(sentence)
 
+
 if do_oov:
     dummy_count = 0
     total = len(corpus_clean)
@@ -265,22 +266,18 @@ if do_oov:
 #    pickle.dump(bigrams, f)
 #######################################################################################################################
 
-corpus_clean = None
-WordCounts = None
-vocabulary = None
+valid_vocabulary = None
+invalid_vocabulary = None
 corpus_clean_no_OOV = None
 
 if shortcut_2:
     # Load objects
 
-    #with open('corpus_clean', 'rb') as f:
-    #    corpus_clean = pickle.load(f)
+    with open('invalid_vocabulary', 'rb') as f:
+        invalid_vocabulary = pickle.load(f)
 
-    #with open('vocabulary', 'rb') as f:
-    #    vocabulary = pickle.load(f)
-
-    #with open('WordCounts', 'rb') as f:
-    #    WordCounts = pickle.load(f)
+    with open('valid_vocabulary', 'rb') as f:
+        valid_vocabulary = pickle.load(f)
 
     with open('AllWords', 'rb') as f:
         AllWords = pickle.load(f)
@@ -323,7 +320,7 @@ if demo_ngrams:
 unigram_counter = Counter()
 bigram_counter = Counter()
 trigram_counter = Counter()
-sample_ngrams = True
+sample_ngrams = False
 if sample_ngrams:
     print("Just started the sample ngram-ing")
     sample = corpus_clean_no_OOV[0:1000]
@@ -346,6 +343,37 @@ if sample_ngrams:
     print("Just ended the sample ngram-ing")
 
 #######################################################################################################################
+
+#  Language model =
+#   P(w_i_k):=
+#   for bigrams:= P(w_1|start)*P(w_2|w_1)*..*P(w_k|w_k-1) =
+#       where P(w_k|w_k-1) = [c(w_k-1,w_k) + a] / [c(w_k-1 + a*|V|]
+#   for trigrams:= P(w_1|start1,start2)*P(w_2|start2,w_1)*P(w_3|w_1,w_2)*..*P(w_k|w_k-2,w_k-1)
+#       where P(w_k|w_k-2,w_k-1) = [c(w_k-2,w_k-1,w_k) + a] / [c(w_k-2,c_k-1) + a * |V|]
+#
+# P(w_1_k|t_1_k) = ?? =
+#       Π_i=1_k{P(w_i|t_i)} =
+#       Π_i=1_k{[c(t_i,w_i) + a] / [c(t_i + a*|V|]} ??? which a is here ???
+
+'''
+Calculate the probability
+of bigram ('the', 'Department')
+P(('the', 'Department')) = C(('the', 'Department')) + 1 / C(('the',)) + |V|
+
+'''
+
+#We should fine-tune alpha on a held-out dataset
+alpha = 0.01
+#Calculate vocab size
+vocab_size = len(valid_vocabulary)
+#Bigram prob + laplace smoothing
+bigram_prob = (bigram_counter[('the', 'Department')] +alpha) / (unigram_counter[('the',)] + alpha*vocab_size)
+print("bigram_prob: {0:.3f} ".format(bigram_prob))
+bigram_log_prob = math.log2(bigram_prob)
+print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
+
+
+
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
