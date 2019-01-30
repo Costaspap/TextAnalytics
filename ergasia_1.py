@@ -343,17 +343,34 @@ if sample_ngrams:
     print("Just ended the sample ngram-ing")
 
 #######################################################################################################################
-
+# Theory explained:
+#######################################################################################################################
+#
 #  Language model =
 #   P(w_i_k):=
 #   for bigrams:= P(w_1|start)*P(w_2|w_1)*..*P(w_k|w_k-1) =
-#       where P(w_k|w_k-1) = [c(w_k-1,w_k) + a] / [c(w_k-1 + a*|V|]
+#       where P(w_k|w_k-1) = [c(w_k-1,w_k) + a] / [c(w_k-1 + a*|V|] =
+#       e.g. P(('the', 'Department')) = [C(('the', 'Department')) + a ] / [ C(('the',)) + a*|V| ] =
+#           = bigram_prob =
+#           = (bigram_counter[('the', 'Department')] + a) / (unigram_counter[('the',)] + a*vocab_size)
 #   for trigrams:= P(w_1|start1,start2)*P(w_2|start2,w_1)*P(w_3|w_1,w_2)*..*P(w_k|w_k-2,w_k-1)
 #       where P(w_k|w_k-2,w_k-1) = [c(w_k-2,w_k-1,w_k) + a] / [c(w_k-2,c_k-1) + a * |V|]
+#       e.g. P(('all', 'the', 'Departments')) =
+#           = [C(('all', 'the', 'Departments')) + a ] / [ C(('the', 'Departments')) + a*|V| ] =
+#           = trigram_prob =
+#           = (trigram_counter[('all', 'the', 'Departments')] + a) /
+#                   (bigram_counter[('the','Departments')] + alpha*vocab_size)
 #
-# P(w_1_k|t_1_k) = ?? =
+# Most probable sentence:=
+#       t_1_k_opt = argmax{P(t_1_k | w_1_k)} =
+#       argmax{P(t_1_k) * P(w_1_k | t_1_k)} =
+#       argmax{language_model_for_1_k * P(w_1_k | t_1_k)}}
+#       where
+#       P(w_1_k|t_1_k) =
 #       Π_i=1_k{P(w_i|t_i)} =
-#       Π_i=1_k{[c(t_i,w_i) + a] / [c(t_i + a*|V|]} ??? which a is here ???
+#       Π_i=1_k{ 1 / edit_distance}
+#
+#######################################################################################################################
 
 '''
 Calculate the probability
@@ -372,7 +389,16 @@ print("bigram_prob: {0:.3f} ".format(bigram_prob))
 bigram_log_prob = math.log2(bigram_prob)
 print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 
+#######################################################################################################################
 
+# TODO
+# -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas
+# -2- function for bigram prob (almost ready)
+# -3- function for trigram prob (almost ready)
+# -4- function for Linear interpolation (almost ready)
+# -5- function for combining the above probs into making the P(t_i_k), aka the Language model
+# -6- function for edit distance
+# -7- function for most probable sentence
 
 #######################################################################################################################
 #######################################################################################################################
