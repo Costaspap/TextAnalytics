@@ -24,9 +24,9 @@ with open('object_name', 'rb') as f:
 from pprint import pprint
 import time
 import sys
-print("Imports Completed")
 import math
-download('punkt')
+print("Imports Completed")
+# download('punkt')
 
 #######################################################################################################################
 # Cockpit:
@@ -287,7 +287,7 @@ if shortcut_2:
 
 #######################################################################################################################
 
-demo_ngrams = True
+demo_ngrams = False
 if demo_ngrams:
     print(corpus_clean_no_OOV.__class__)
     print(corpus_clean_no_OOV[0])
@@ -400,6 +400,71 @@ print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 # -6- function for edit distance
 # -7- function for most probable sentence
 
+#######################################################################################################################
+# -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas
+
+
+def split_into_bigrams(sentence, pad=True):
+    list = ["<start>"]+sentence+["<end>"] if pad else sentence
+    return [gram for gram in ngrams(list, 2)]
+
+
+def split_into_trigrams(sentence, pad=True):
+    list = ["<start_1>", "<start_2>"]+sentence+["<end>"] if pad else sentence
+    return [gram for gram in ngrams(list, 3)]
+
+
+sentence = corpus_clean_no_OOV[0]
+print(sentence)
+print(split_into_bigrams(sentence))
+print(split_into_trigrams(sentence))
+
+#######################################################################################################################
+# -2- function for bigram prob
+
+
+def bigram_prob(ngram, vocab_size, a=0.01):
+    x = ngram[0]
+    y = ngram[1]
+    return (bigram_counter[(x,y)] + a) / (unigram_counter[(x,)] + a*vocab_size)
+
+
+sentence = corpus_clean_no_OOV[0]
+a = 0.1
+vocab_size = len(valid_vocabulary)
+for bigram in split_into_bigrams(sentence):
+    print(bigram, bigram_prob(bigram, a))
+
+sentence = corpus_clean_no_OOV[0] + ['next','item']
+a = 0.1
+vocab_size = len(valid_vocabulary)
+for bigram in split_into_bigrams(sentence):
+    print(bigram, bigram_prob(bigram, a))
+
+#######################################################################################################################
+# -3- function for trigram prob (almost ready)
+
+
+def trigram_prob(ngram, vocab_size, a=0.01):
+    x = ngram[0]
+    y = ngram[1]
+    z = ngram[2]
+    return (trigram_counter[(x,y,z)] + a) / (bigram_counter[(x,y,)] + a*vocab_size)
+
+
+sentence = corpus_clean_no_OOV[0]
+a = 0.1
+vocab_size = len(valid_vocabulary)
+for bigram in split_into_trigrams(sentence):
+    print(bigram, trigram_prob(bigram, a))
+
+sentence = corpus_clean_no_OOV[0] + ['next','item','is']
+a = 0.1
+vocab_size = len(valid_vocabulary)
+for bigram in split_into_trigrams(sentence):
+    print(bigram, trigram_prob(bigram, a))
+
+#######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
