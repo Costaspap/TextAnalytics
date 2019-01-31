@@ -224,6 +224,9 @@ def split_sentence(sentence):
     return tokenizer.tokenize(sentence)
 
 
+# otan ekana antikatastash twn UNK to ekana mono se 10k records
+# kai ekei kata lathos to ekana lista apo listes apo words..
+
 if do_oov:
     dummy_count = 0
     total = len(corpus_clean)
@@ -417,12 +420,18 @@ trigram_counter = Counter()
 
 
 def split_into_unigrams(sentence):
+    if sentence.__class__ == str:
+        print("Error in corpus sentence!!")
+        telos()
     ngs = [gram for gram in ngrams(sentence, 1)]
     unigram_counter.update(ngs)
     return ngs
 
 
 def split_into_bigrams(sentence, pad=True, s="start", e="end"):
+    if sentence.__class__ == str:
+        print("Error in corpus sentence!!")
+        telos()
     list = [s]+sentence+[e] if pad else sentence
     ngs = [gram for gram in ngrams(list, 2)]
     bigram_counter.update(ngs)
@@ -430,6 +439,9 @@ def split_into_bigrams(sentence, pad=True, s="start", e="end"):
 
 
 def split_into_trigrams(sentence, pad=True, s1= "start1", s2= 'start2', e='end'):
+    if sentence.__class__ == str:
+        print("Error in corpus sentence!!")
+        telos()
     list = [s1, s2]+sentence+[e] if pad else sentence
     ngs = [gram for gram in ngrams(list, 3)]
     trigram_counter.update(ngs)
@@ -612,8 +624,39 @@ print("\n------------------------------")
 # -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
 
 
+def bigram_crossentropy_perplexity(vocab_size, a=0.01):
+    sum_prob = 0
+    bigram_cnt = 0
+    for sentence in corpus_clean_no_OOV:
+        for bigram in split_into_bigrams(sentence):
+            sum_prob += math.log2(bigram_prob(bigram, vocab_size, a))
+            bigram_cnt += 1
+    HC = -sum_prob / bigram_cnt
+    perpl = math.pow(2, HC)
+    print("Cross Entropy: {0:.3f}".format(HC))
+    print("perplexity: {0:.3f}".format(perpl))
 
 
+def trigram_crossentropy_perplexity(vocab_size, a=0.01):
+    sum_prob = 0
+    trigram_cnt = 0
+    for sentence in corpus_clean_no_OOV:
+        for trigram in split_into_trigrams(sentence):
+            sum_prob += math.log2(trigram_prob(trigram, vocab_size, a))
+            trigram_cnt += 1
+    HC = -sum_prob / trigram_cnt
+    perpl = math.pow(2, HC)
+    print("Cross Entropy: {0:.3f}".format(HC))
+    print("perplexity: {0:.3f}".format(perpl))
+
+
+print("\n------------------------------")
+print("Crossentropies & perplexities of models")
+print("debug0", corpus_clean_no_OOV[0])
+vocab_size = len(valid_vocabulary)
+bigram_crossentropy_perplexity(vocab_size)
+trigram_crossentropy_perplexity(vocab_size)
+print("\n------------------------------")
 
 #######################################################################################################################
 #######################################################################################################################
