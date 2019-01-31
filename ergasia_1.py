@@ -396,11 +396,11 @@ print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 #######################################################################################################################
 
 # TODO
-# -1- function for spliting a sentence into all serial unigrams, bigrams and trigrams needed for the prob formulas (done)
-# -2- function for bigram prob (done)
-# -3- function for trigram prob (done)
-# -4- function for Linear interpolation (almost ready)
-# -5- function for combining the above probs into making the P(t_i_k), aka the Language model
+# -1- functions for spliting a sentence into all serial unigrams, bigrams and trigrams needed for the prob formulas (done)
+# -2- functions for bigram prob (done)
+# -3- functions for trigram prob (done)
+# -4- functions for Linear interpolation (done)
+# -5- functions for combining the above probs into making the P(t_i_k), aka the Language models (done)
 # -6- function for edit distance
 # -7- function for most probable sentence
 
@@ -507,7 +507,7 @@ print("\n------------------------------")
 
 
 #######################################################################################################################
-
+# -4- functions for Linear interpolation
 
 def bigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l = 0.7):
     """
@@ -555,6 +555,62 @@ vocab_size = len(valid_vocabulary)
 pprint(trigram_linear_interpolation_probs(sentence, vocab_size, C))
 print("\n------------------------------")
 
+#######################################################################################################################
+# -5- functions for combining the above probs into making the P(t_i_k), aka the Language models
+
+
+def unigram_language_model(sentence, vocab_size, C, a = 0.01):
+    language_model = 1 # neutral value
+    for unigram in split_into_unigrams(sentence):
+        language_model *= unigram_prob(unigram, vocab_size, C, a)
+    return language_model
+
+
+def bigram_language_model(sentence, vocab_size, a = 0.01):
+    language_model = 1 # neutral value
+    for bigram in split_into_bigrams(sentence):
+        language_model *= bigram_prob(bigram, vocab_size, a)
+    return language_model
+
+
+def trigram_language_model(sentence, vocab_size, a = 0.01):
+    language_model = 1 # neutral value
+    for trigram in split_into_trigrams(sentence):
+        language_model *= trigram_prob(trigram, vocab_size, a)
+    return language_model
+
+
+def bigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l = 0.7):
+    language_model = 1 # neutral value
+    for pair in bigram_linear_interpolation_probs(sentence, vocab_size, C):
+        prob = pair[1]
+        language_model *= prob
+    return language_model
+
+
+def trigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l1 = 0.7, l2 = 0.2):
+    language_model = 1 # neutral value
+    for pair in trigram_linear_interpolation_probs(sentence, vocab_size, C):
+        prob = pair[1]
+        language_model *= prob
+    return language_model
+
+
+print("\n------------------------------")
+print("Language models for single sentence")
+sentence = corpus_clean_no_OOV[0]
+vocab_size = len(valid_vocabulary)
+print(np.round(unigram_language_model(sentence, vocab_size, C),2)," %")
+print(np.round(bigram_language_model(sentence, vocab_size, C),2)," %")
+print(np.round(trigram_language_model(sentence, vocab_size, C),2)," %")
+print(np.round(bigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %")
+print(np.round(trigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %")
+print("\n------------------------------")
+
+#######################################################################################################################
+
+#######################################################################################################################
+#######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
