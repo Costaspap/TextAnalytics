@@ -1,0 +1,16 @@
+1. original corpus (text)
+2. Clean original corpus (string) ( remove line breaks and unnecessary text, reduce whitespace to 1)
+3. Split into sentences using nltk sent_tokenizer ->(list of strings)-> corpus_clean
+4. Randomly split corpus_clean to trainset,devtest,test1,test2
+5. Split the training set into words,remove punctuation and create wordcounts and vocabulary
+6. From the wordcounts and vocabulary form the valid and invalid vocabulary (low freq words assigned to invalid and high freq to valid)
+7. For each word in the invalid vocabulary, replace that word in all sets (train,devtest,test1,test2) with the word "UNK"
+8. Ready for modelling.
+9. Use devtest, to adjust a values & lambda values, so that the probabilities given by language models get higher.
+10. When the parameters are finallized, count the probabilities of the language models on the test1.
+11. Choose your final model among unigram,bigram,trigram, linear_interpol_bigram, linear_interpol_trigram, language models.
+    - The (iii) section of the exercise definition tells us the metric to compare models against the test1 set,
+        are crossentropy and perplecity of the models.
+    - The (iii) section requests some changes (why??) on the test1 set before calculating the crossentropies and perplexities.
+12. Evaluate how good the final model actually is, be counting its probabilities on test2 set.
+13. Finito de la musica.
