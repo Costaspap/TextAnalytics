@@ -25,6 +25,7 @@ from pprint import pprint
 import time
 import sys
 import math
+import numpy as np
 print("Imports Completed")
 # download('punkt')
 
@@ -269,6 +270,7 @@ if do_oov:
 valid_vocabulary = None
 invalid_vocabulary = None
 corpus_clean_no_OOV = None
+C = None
 
 if shortcut_2:
     # Load objects
@@ -281,6 +283,7 @@ if shortcut_2:
 
     with open('AllWords', 'rb') as f:
         AllWords = pickle.load(f)
+    C = len(AllWords)
 
     with open('corpus_clean_no_OOV', 'rb') as f:
         corpus_clean_no_OOV = pickle.load(f)
@@ -354,12 +357,12 @@ if sample_ngrams:
 #           = bigram_prob =
 #           = (bigram_counter[('the', 'Department')] + a) / (unigram_counter[('the',)] + a*vocab_size)
 #   for trigrams:= P(w_1|start1,start2)*P(w_2|start2,w_1)*P(w_3|w_1,w_2)*..*P(w_k|w_k-2,w_k-1)
-#       where P(w_k|w_k-2,w_k-1) = [c(w_k-2,w_k-1,w_k) + a] / [c(w_k-2,c_k-1) + a * |V|]
+#       where P(w_k|w_k-2,w_k-1) = [c(w_k-2,w_k-1,w_k) + a] / [c(w_k-2,w_k-1) + a * |V|]
 #       e.g. P(('all', 'the', 'Departments')) =
-#           = [C(('all', 'the', 'Departments')) + a ] / [ C(('the', 'Departments')) + a*|V| ] =
+#           = [C(('all', 'the', 'Departments')) + a ] / [ C(('all', 'the')) + a*|V| ] =
 #           = trigram_prob =
 #           = (trigram_counter[('all', 'the', 'Departments')] + a) /
-#                   (bigram_counter[('the','Departments')] + alpha*vocab_size)
+#                   (bigram_counter[('all','the')] + alpha*vocab_size)
 #
 # Most probable sentence:=
 #       t_1_k_opt = argmax{P(t_1_k | w_1_k)} =
@@ -393,9 +396,9 @@ print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 #######################################################################################################################
 
 # TODO
-# -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas
-# -2- function for bigram prob (almost ready)
-# -3- function for trigram prob (almost ready)
+# -1- function for spliting a sentence into all serial unigrams, bigrams and trigrams needed for the prob formulas (done)
+# -2- function for bigram prob (done)
+# -3- function for trigram prob (done)
 # -4- function for Linear interpolation (almost ready)
 # -5- function for combining the above probs into making the P(t_i_k), aka the Language model
 # -6- function for edit distance
@@ -404,15 +407,32 @@ print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 #######################################################################################################################
 # -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas
 
+# THESE 3 ARE A MUST:
+unigram_counter = Counter()
+bigram_counter = Counter()
+trigram_counter = Counter()
+# Reminder:
+# C = len(AllWords)
 
-def split_into_bigrams(sentence, pad=True):
-    list = ["<start>"]+sentence+["<end>"] if pad else sentence
-    return [gram for gram in ngrams(list, 2)]
+
+def split_into_unigrams(sentence):
+    ngs = [gram for gram in ngrams(sentence, 1)]
+    unigram_counter.update(ngs)
+    return ngs
 
 
-def split_into_trigrams(sentence, pad=True):
-    list = ["<start_1>", "<start_2>"]+sentence+["<end>"] if pad else sentence
-    return [gram for gram in ngrams(list, 3)]
+def split_into_bigrams(sentence, pad=True, s="start", e="end"):
+    list = [s]+sentence+[e] if pad else sentence
+    ngs = [gram for gram in ngrams(list, 2)]
+    bigram_counter.update(ngs)
+    return ngs
+
+
+def split_into_trigrams(sentence, pad=True, s1= "start1", s2= 'start2', e='end'):
+    list = [s1, s2]+sentence+[e] if pad else sentence
+    ngs = [gram for gram in ngrams(list, 3)]
+    trigram_counter.update(ngs)
+    return ngs
 
 
 sentence = corpus_clean_no_OOV[0]
@@ -421,7 +441,12 @@ print(split_into_bigrams(sentence))
 print(split_into_trigrams(sentence))
 
 #######################################################################################################################
-# -2- function for bigram prob
+# -2- functions for unigram & bigram prob
+
+
+def unigram_prob(ngram, vocab_size, C, a=0.01):
+    x = ngram[0]
+    return (unigram_counter[(x,)] + a) / (C + a*vocab_size)
 
 
 def bigram_prob(ngram, vocab_size, a=0.01):
@@ -430,20 +455,32 @@ def bigram_prob(ngram, vocab_size, a=0.01):
     return (bigram_counter[(x,y)] + a) / (unigram_counter[(x,)] + a*vocab_size)
 
 
-sentence = corpus_clean_no_OOV[0]
-a = 0.1
-vocab_size = len(valid_vocabulary)
-for bigram in split_into_bigrams(sentence):
-    print(bigram, bigram_prob(bigram, a))
+def print_sentence_unigram_probs(sentence, vocab_size, C, a=0.01):
+    for unigram in split_into_unigrams(sentence):
+        print(unigram, np.round(100*unigram_prob(unigram, vocab_size, C, a),2) , " %")
 
-sentence = corpus_clean_no_OOV[0] + ['next','item']
-a = 0.1
+
+def print_sentence_bigram_probs(sentence, vocab_size, a=0.01):
+    for bigram in split_into_bigrams(sentence):
+        print(bigram, np.round(100*bigram_prob(bigram, vocab_size, a),2) , " %")
+
+
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
-for bigram in split_into_bigrams(sentence):
-    print(bigram, bigram_prob(bigram, a))
+print_sentence_unigram_probs(sentence, vocab_size, C, a=0.01)
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0]
+vocab_size = len(valid_vocabulary)
+print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0] + ['next','item']
+vocab_size = len(valid_vocabulary)
+print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
+print("\n------------------------------")
 
 #######################################################################################################################
-# -3- function for trigram prob (almost ready)
+# -3- functions for trigram prob (almost ready)
 
 
 def trigram_prob(ngram, vocab_size, a=0.01):
@@ -453,24 +490,79 @@ def trigram_prob(ngram, vocab_size, a=0.01):
     return (trigram_counter[(x,y,z)] + a) / (bigram_counter[(x,y,)] + a*vocab_size)
 
 
-sentence = corpus_clean_no_OOV[0]
-a = 0.1
-vocab_size = len(valid_vocabulary)
-for bigram in split_into_trigrams(sentence):
-    print(bigram, trigram_prob(bigram, a))
+def print_sentence_trigram_probs(sentence, vocab_size, a=0.01):
+    for trigram in split_into_trigrams(sentence):
+        print(trigram, np.round(100*trigram_prob(trigram, vocab_size, a),2), " %")
 
-sentence = corpus_clean_no_OOV[0] + ['next','item','is']
-a = 0.1
+
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
-for bigram in split_into_trigrams(sentence):
-    print(bigram, trigram_prob(bigram, a))
+print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0] + ['next','item','is']
+vocab_size = len(valid_vocabulary)
+print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
+print("\n------------------------------")
+
 
 #######################################################################################################################
+
+
+def bigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l = 0.7):
+    """
+    Due to the nature of the calculations, I return all bigram linear interpolations at once for the sentence
+    :param sentence:
+    :param vocab_size:
+    :param a:
+    :return:
+    """
+    bigrams = split_into_bigrams(sentence)
+    bigram_linear_interpolations = []
+    for bigram in bigrams:
+        unigram = bigram[0]
+        linear_interpolation = l * bigram_prob(bigram, vocab_size, a) + (l-1) * unigram_prob(unigram, vocab_size, C, a)
+        bigram_linear_interpolations.append([bigram, np.round(linear_interpolation,4)])
+    return bigram_linear_interpolations
+
+
+def trigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l1 = 0.7, l2 = 0.2):
+    """
+    Due to the nature of the calculations, I return all trigram linear interpolations at once for the sentence
+    :param sentence:
+    :param vocab_size:
+    :param a:
+    :return:
+    """
+    trigrams = split_into_trigrams(sentence)
+    trigram_linear_interpolations = []
+    for trigram in trigrams:
+        bigram = (trigram[0], trigram[1],)
+        unigram = bigram[0]
+        linear_interpolation = l1 * trigram_prob(trigram, vocab_size, a) + l2 * bigram_prob(bigram, vocab_size, a) +\
+                               (1 - l1 -l2) * unigram_prob(unigram, vocab_size, C, a)
+        trigram_linear_interpolations.append([trigram, np.round(linear_interpolation,4)])
+    return trigram_linear_interpolations
+
+
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0]
+vocab_size = len(valid_vocabulary)
+pprint(bigram_linear_interpolation_probs(sentence, vocab_size, C))
+print("\n------------------------------")
+sentence = corpus_clean_no_OOV[0]
+vocab_size = len(valid_vocabulary)
+pprint(trigram_linear_interpolation_probs(sentence, vocab_size, C))
+print("\n------------------------------")
+
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 # FIN
 #######################################################################################################################
+
+# Can comment out locally, to move on.
+telos()
 
 ########## L-TS additions ###########
     
