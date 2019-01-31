@@ -401,8 +401,9 @@ print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 # -3- functions for trigram prob (done)
 # -4- functions for Linear interpolation (done)
 # -5- functions for combining the above probs into making the P(t_i_k), aka the Language models (done)
-# -6- function for edit distance
-# -7- function for most probable sentence
+# -6- function for edit distance (cancelled, out of scope)
+# -7- function for most probable sentence (cancelled, out of scope)
+# -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
 
 #######################################################################################################################
 # -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas
@@ -608,6 +609,11 @@ print(np.round(trigram_linear_interpolation_language_model(sentence, vocab_size,
 print("\n------------------------------")
 
 #######################################################################################################################
+# -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
+
+
+
+
 
 #######################################################################################################################
 #######################################################################################################################
