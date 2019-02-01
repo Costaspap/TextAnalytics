@@ -5,7 +5,7 @@
 import re
 import os
 import string
-from nltk import sent_tokenize, word_tokenize, download
+from nltk import sent_tokenize, word_tokenize
 from IPython.display import clear_output
 from collections import Counter
 import gc
@@ -26,18 +26,22 @@ import time
 import sys
 import math
 import numpy as np
-print("Imports Completed")
+from sklearn.model_selection import train_test_split
+#
+# from nltk import download
 # download('punkt')
-
+#
+print("Imports Completed")
 #######################################################################################################################
 # Cockpit:
 #######################################################################################################################
 
 read_corpus = False
 clean_corpus = False
+create_datasets = False
 do_tokenize = False
-shortcut_1 = False
-do_vocabularies = False
+# -deprecated- shortcut_1 = False
+do_vocabularies = True
 do_oov = False
 shortcut_2 = True
 demo_ngrams = False
@@ -54,13 +58,13 @@ def clean_text(text):
     4. turn everything to lower case
     """
     clean = re.compile('<.*?>')
-    
-    out = text.replace('\n', ' ') # Remove line breaks
-    out = re.sub(clean, ' ', out) # Remove tagged text e.g. <Chapter 1>
-    out = re.sub(' +', ' ', out) # Reduce whitespace down to one
-    
-    out = out.lower() # Turn everything to lower case
-    
+
+    out = text.replace('\n', ' ')  # Remove line breaks
+    out = re.sub(clean, ' ', out)  # Remove tagged text e.g. <Chapter 1>
+    out = re.sub(' +', ' ', out)  # Reduce whitespace down to one
+
+    out = out.lower()  # Turn everything to lower case
+
     return out
 
 
@@ -73,6 +77,15 @@ def telos():
 
 #######################################################################################################################
 
+
+"""
+corpus_original : a string with the whole corpus text uncleansed.
+corpus_clean : a list of cleansed strings, where each string is a cleansed corpus sentence,
+                where only single spaces and no punctuation exists.
+corpus_clean_string : a string with the whole corpus text cleansed, with the cleansing of corpus_clean
+"""
+
+#######################################################################################################################
 corpus_clean = []
 corpus_original = ''
 if read_corpus:
@@ -80,7 +93,7 @@ if read_corpus:
     path = abs_path + '/en/'
     sentences = []
     text = ''
-    total = len(os.listdir(path)) # Total files
+    total = len(os.listdir(path))  # Total files
     count = 0
 
     for file in os.listdir(path):
@@ -92,12 +105,29 @@ if read_corpus:
         regex = re.compile('[%s]' % re.escape(string.punctuation))
         file_sentences = [regex.sub('', sent).strip() for sent in sent_tokenize(clean_text(file_text))]
 
+        # What just happened in cleansing:
+        #
+        # -1- The whole single text of the corpus had removed: <tags> & \n
+        # -2- Then the whole single text of the corpus had all big spaces to become single spaces
+        # -3- Then the whole single text of the corpus was tokenized using its punctuation.
+        # -4- Each token (string) corresponds to a sentence
+        # -5- From each sentence string we removed all punctuation.
+        #       -- SOS: We do not need spaces in their place, the sentences have already spaces where needed.
+        # -6- corpus_clean is where the new sentences are stored
+        # -7- corpus_clean is a list of sentences, where the sentences are strings.
+
         corpus_clean = corpus_clean + file_sentences
         count += 1
 
-        clear_output(wait = True)
-        print('File ' + file + ' finished. Completed ' + str(round(count*100/total,2)) + '%')
+        clear_output(wait=True)
+        print('File ' + file + ' finished. Completed ' + str(round(count * 100 / total, 2)) + '%')
 
+    # Save the basic objects:
+    with open('corpus_original', 'wb') as f:
+        pickle.dump(corpus_original, f)
+    with open('corpus_clean', 'wb') as f:
+        pickle.dump(corpus_clean, f)
+# telos()
 #######################################################################################################################
 
 """
@@ -123,35 +153,84 @@ Its sentences = [sent.strip() for sent in sent_tokenize(clean_text(text))]: <cla
 """
 
 #######################################################################################################################
-# Save the basic objects:
 
-if read_corpus:
-    with open('corpus_original', 'wb') as f:
-        pickle.dump(corpus_original, f)
-    with open('corpus_clean', 'wb') as f:
-        pickle.dump(corpus_clean, f)
+# DEPRECATED since we started using the validation set for the vocabulary
+#
+# Apply the exact same cleansing for the whole corpus text, and keep the final result a text.
+# corpus_clean_string = None
+# if clean_corpus:
+#
+#     with open('corpus_original', 'rb') as f:
+#         corpus_original = pickle.load(f)
+#
+#     regex = re.compile('[%s]' % re.escape(string.punctuation))
+#     corpus_clean_string = regex.sub('', clean_text(corpus_original))
+#
+#     print('-------------------------')
+#     print('corpus_clean_string created.')
+#     print('-------------------------')
+#
+#     with open('corpus_clean_string', 'wb') as f:
+#         pickle.dump(corpus_clean_string, f)
+#
+#     del corpus_original
+#     gc.collect()
+# telos()
 
 #######################################################################################################################
+# Creating the datasets:
 
-corpus_clean_string = None
-if clean_corpus:
-    regex = re.compile('[%s]' % re.escape(string.punctuation))
-    corpus_clean_string = regex.sub('', clean_text(corpus_original))
+if create_datasets:
+    with open('corpus_clean', 'rb') as f:
+        corpus_clean = pickle.load(f)
 
-    print('-------------------------')
-    print('corpus_clean_string created.')
-    print('-------------------------')
+    total = len(corpus_clean)
+    sets = list(range(0, total))
 
-    with open('corpus_clean_string', 'wb') as f:
-        pickle.dump(corpus_clean_string, f)
+    # 60% for train
+    training_idx, tuning_idx = train_test_split(sets, train_size=.6, random_state=2019)
 
-    del corpus_original
+    # 20%,10%,10% for validation(development), test1 and test2 datasets.
+    validation_idx, test_idx = train_test_split(tuning_idx, train_size=.5, random_state=2019)
+    test1_idx, test2_idx = train_test_split(test_idx, train_size=.5, random_state=2019)
+
+    training_set = [corpus_clean[i] for i in training_idx]
+    validation_set = [corpus_clean[i] for i in validation_idx]
+    test1_set = [corpus_clean[i] for i in test1_idx]
+    test2_set = [corpus_clean[i] for i in test2_idx]
+
+    del training_idx, validation_idx, tuning_idx, test1_idx, test2_idx
     gc.collect()
 
+    print('Training Size: ', len(training_set))
+    print('Validation Size: ', len(validation_set))
+    print('Test1 Size: ', len(test1_set))
+    print('Test2 Size: ', len(test2_set))
+
+    with open('training_set', 'wb') as f:
+        pickle.dump(training_set, f)
+    with open('validation_set', 'wb') as f:
+        pickle.dump(validation_set, f)
+    with open('test1_set', 'wb') as f:
+        pickle.dump(test1_set, f)
+    with open('test2_set', 'wb') as f:
+        pickle.dump(test2_set, f)
+# telos()
+
 #######################################################################################################################
 
+AllWords = []
+vocabulary = None
+WordCounts = None
 if do_tokenize:
-    AllWords = word_tokenize(corpus_clean_string)
+
+    with open('corpus_clean', 'rb') as f:
+        corpus_clean = pickle.load(f)
+
+    total = len(corpus_clean)
+    for i in range(0, len(corpus_clean)):
+        AllWords = AllWords + word_tokenize(corpus_clean[i])
+
     print('-------------------------')
     print('Words Tokenized.')
     print('-------------------------')
@@ -173,29 +252,30 @@ if do_tokenize:
     with open('WordCounts', 'wb') as f:
         pickle.dump(WordCounts, f)
 
-    del corpus_clean_string, AllWords
+    del AllWords
     gc.collect()
+# telos()
 
 #######################################################################################################################
 
-corpus_clean = None
-WordCounts = None
-vocabulary = None
-if shortcut_1:
-
-    # Load objects
-
-    with open('corpus_clean', 'rb') as f:
-        corpus_clean = pickle.load(f)
-
-    with open('vocabulary', 'rb') as f:
-        vocabulary = pickle.load(f)
-
-    with open('WordCounts', 'rb') as f:
-        WordCounts = pickle.load(f)
-
-    with open('AllWords', 'rb') as f:
-        AllWords = pickle.load(f)
+# corpus_clean = None
+# WordCounts = None
+# vocabulary = None
+# if shortcut_1:
+#
+#     # Load objects
+#
+#     with open('corpus_clean', 'rb') as f:
+#         corpus_clean = pickle.load(f)
+#
+#     with open('vocabulary', 'rb') as f:
+#         vocabulary = pickle.load(f)
+#
+#     with open('WordCounts', 'rb') as f:
+#         WordCounts = pickle.load(f)
+#
+#     with open('AllWords', 'rb') as f:
+#         AllWords = pickle.load(f)
 
 #######################################################################################################################
 # Ignore low frequency words
@@ -203,8 +283,12 @@ if shortcut_1:
 valid_vocabulary = None
 invalid_vocabulary = None
 if do_vocabularies:
-    valid_vocabulary = [k for k,v in WordCounts.items() if v > 10]
-    invalid_vocabulary = [k for k,v in WordCounts.items() if v <= 10]
+
+    with open('vocabulary', 'rb') as f:
+        vocabulary = pickle.load(f)
+
+    valid_vocabulary = [k for k, v in WordCounts.items() if v > 10]
+    invalid_vocabulary = [k for k, v in WordCounts.items() if v <= 10]
     print("valid voc", len(valid_vocabulary))
     print("invalid voc", len(invalid_vocabulary))
 
@@ -213,6 +297,7 @@ if do_vocabularies:
 
     with open('invalid_vocabulary', 'wb') as f:
         pickle.dump(invalid_vocabulary, f)
+telos()
 
 #######################################################################################################################
 # Replace OOV words in sentences
@@ -258,7 +343,7 @@ if do_oov:
 #   clear_output(wait = True)
 #   print('Sentences processed ' + str(i+1) + ' out of ' + str(total) )
 #######################################################################################################################
-# Creating the n-grams is actually not needed!! Only counting them is!!
+# Creating the n-grams at this stage is actually not needed!! Only counting them is!!
 #
 # tokens = AllWords
 # bigrams = [ gram for gram in ngrams(tokens, 2) ]
@@ -293,60 +378,60 @@ if shortcut_2:
 
 #######################################################################################################################
 
-demo_ngrams = False
-if demo_ngrams:
-    print(corpus_clean_no_OOV.__class__)
-    print(corpus_clean_no_OOV[0])
-    print(corpus_clean_no_OOV[0].__class__)
-    print(corpus_clean_no_OOV[0][0].__class__)
-
-    print(AllWords.__class__)
-    print(AllWords[0])
-    print(AllWords[0].__class__)
-    print(AllWords[0:10])
-
-    gc.collect()
-
-    # Single sentence, for testing corpus_clean_no_OOV:
-    unigram_counter = Counter()
-    unigram_counter.update([gram for gram in ngrams(corpus_clean_no_OOV[0], 1, pad_left=True, pad_right=True,
-                                                       left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-    pprint(corpus_clean_no_OOV[0])
-    pprint(unigram_counter)
-
-    # Single sentence for testing AllWords:
-    unigram_counter = Counter()
-    unigram_counter.update([gram for gram in ngrams(AllWords[0:10], 1, pad_left=True, pad_right=True,
-                                                       left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-    pprint(AllWords[0:10])
-    pprint(unigram_counter)
+# demo_ngrams = False
+# if demo_ngrams:
+#     print(corpus_clean_no_OOV.__class__)
+#     print(corpus_clean_no_OOV[0])
+#     print(corpus_clean_no_OOV[0].__class__)
+#     print(corpus_clean_no_OOV[0][0].__class__)
+#
+#     print(AllWords.__class__)
+#     print(AllWords[0])
+#     print(AllWords[0].__class__)
+#     print(AllWords[0:10])
+#
+#     gc.collect()
+#
+#     # Single sentence, for testing corpus_clean_no_OOV:
+#     unigram_counter = Counter()
+#     unigram_counter.update([gram for gram in ngrams(corpus_clean_no_OOV[0], 1, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     pprint(corpus_clean_no_OOV[0])
+#     pprint(unigram_counter)
+#
+#     # Single sentence for testing AllWords:
+#     unigram_counter = Counter()
+#     unigram_counter.update([gram for gram in ngrams(AllWords[0:10], 1, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     pprint(AllWords[0:10])
+#     pprint(unigram_counter)
 
 #######################################################################################################################
 
-unigram_counter = Counter()
-bigram_counter = Counter()
-trigram_counter = Counter()
-sample_ngrams = False
-if sample_ngrams:
-    print("Just started the sample ngram-ing")
-    sample = corpus_clean_no_OOV[0:1000]
-
-    for sent in sample:
-        unigram_counter.update([gram for gram in ngrams(sent, 1, pad_left=True, pad_right=True,
-                                                       left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-    #pprint(unigram_counter)
-
-    for sent in sample:
-        bigram_counter.update([gram for gram in ngrams(sent, 2, pad_left=True, pad_right=True,
-                                                       left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-    # pprint(bigram_counter)
-
-    sample = corpus_clean_no_OOV[0:1000]
-    for sent in sample:
-        trigram_counter.update([gram for gram in ngrams(sent, 3, pad_left=True, pad_right=True,
-                                                       left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-    # pprint(trigram_counter)
-    print("Just ended the sample ngram-ing")
+# unigram_counter = Counter()
+# bigram_counter = Counter()
+# trigram_counter = Counter()
+# sample_ngrams = False
+# if sample_ngrams:
+#     print("Just started the sample ngram-ing")
+#     sample = corpus_clean_no_OOV[0:1000]
+#
+#     for sent in sample:
+#         unigram_counter.update([gram for gram in ngrams(sent, 1, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     #pprint(unigram_counter)
+#
+#     for sent in sample:
+#         bigram_counter.update([gram for gram in ngrams(sent, 2, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     # pprint(bigram_counter)
+#
+#     sample = corpus_clean_no_OOV[0:1000]
+#     for sent in sample:
+#         trigram_counter.update([gram for gram in ngrams(sent, 3, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     # pprint(trigram_counter)
+#     print("Just ended the sample ngram-ing")
 
 #######################################################################################################################
 # Theory explained:
@@ -378,28 +463,30 @@ if sample_ngrams:
 #
 #######################################################################################################################
 
-'''
-Calculate the probability
-of bigram ('the', 'Department')
-P(('the', 'Department')) = C(('the', 'Department')) + 1 / C(('the',)) + |V|
-
-'''
-
-#We should fine-tune alpha on a held-out dataset
-alpha = 0.01
-#Calculate vocab size
-vocab_size = len(valid_vocabulary)
-#Bigram prob + laplace smoothing
-bigram_prob = (bigram_counter[('the', 'Department')] +alpha) / (unigram_counter[('the',)] + alpha*vocab_size)
-print("bigram_prob: {0:.3f} ".format(bigram_prob))
-bigram_log_prob = math.log2(bigram_prob)
-print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
-
+# '''
+# Calculate the probability
+# of bigram ('the', 'Department')
+# P(('the', 'Department')) = C(('the', 'Department')) + 1 / C(('the',)) + |V|
+#
+# '''
+#
+# unigram_counter = Counter()
+# bigram_counter = Counter()
+# trigram_counter = Counter()
+# #We should fine-tune alpha on a held-out dataset
+# alpha = 0.01
+# #Calculate vocab size
+# vocab_size = len(valid_vocabulary)
+# #Bigram prob + laplace smoothing
+# bigram_prob = (bigram_counter[('the', 'Department')] +alpha) / (unigram_counter[('the',)] + alpha*vocab_size)
+# print("bigram_prob: {0:.3f} ".format(bigram_prob))
+# bigram_log_prob = math.log2(bigram_prob)
+# print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
 
 #######################################################################################################################
 
 # TODO
-# -1- functions for spliting a sentence into all serial unigrams, bigrams and trigrams needed for the prob formulas (done)
+# -1- functions for spliting a sentence into all serial unigrams, bigrams & trigrams needed for the prob formulas (done)
 # -2- functions for bigram prob (done)
 # -3- functions for trigram prob (done)
 # -4- functions for Linear interpolation (done)
