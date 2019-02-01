@@ -5,7 +5,7 @@
 import re
 import os
 import string
-from nltk import sent_tokenize, word_tokenize, download
+from nltk import sent_tokenize, word_tokenize
 from IPython.display import clear_output
 from collections import Counter
 import gc
@@ -26,9 +26,11 @@ import time
 import sys
 import math
 import numpy as np
-print("Imports Completed")
+#
+# from nltk import download
 # download('punkt')
-
+#
+print("Imports Completed")
 #######################################################################################################################
 # Cockpit:
 #######################################################################################################################
@@ -54,13 +56,13 @@ def clean_text(text):
     4. turn everything to lower case
     """
     clean = re.compile('<.*?>')
-    
-    out = text.replace('\n', ' ') # Remove line breaks
-    out = re.sub(clean, ' ', out) # Remove tagged text e.g. <Chapter 1>
-    out = re.sub(' +', ' ', out) # Reduce whitespace down to one
-    
-    out = out.lower() # Turn everything to lower case
-    
+
+    out = text.replace('\n', ' ')  # Remove line breaks
+    out = re.sub(clean, ' ', out)  # Remove tagged text e.g. <Chapter 1>
+    out = re.sub(' +', ' ', out)  # Reduce whitespace down to one
+
+    out = out.lower()  # Turn everything to lower case
+
     return out
 
 
@@ -73,6 +75,15 @@ def telos():
 
 #######################################################################################################################
 
+
+"""
+corpus_original : a string with the whole corpus text uncleansed.
+corpus_clean : a list of cleansed strings, where each string is a cleansed corpus sentence,
+                where only single spaces and no punctuation exists.
+corpus_clean_string : a string with the whole corpus text cleansed, with the cleansing of corpus_clean
+"""
+
+#######################################################################################################################
 corpus_clean = []
 corpus_original = ''
 if read_corpus:
@@ -80,7 +91,7 @@ if read_corpus:
     path = abs_path + '/en/'
     sentences = []
     text = ''
-    total = len(os.listdir(path)) # Total files
+    total = len(os.listdir(path))  # Total files
     count = 0
 
     for file in os.listdir(path):
@@ -92,12 +103,29 @@ if read_corpus:
         regex = re.compile('[%s]' % re.escape(string.punctuation))
         file_sentences = [regex.sub('', sent).strip() for sent in sent_tokenize(clean_text(file_text))]
 
+        # What just happened in cleansing:
+        #
+        # -1- The whole single text of the corpus had removed: <tags> & \n
+        # -2- Then the whole single text of the corpus had all big spaces to become single spaces
+        # -3- Then the whole single text of the corpus was tokenized using its punctuation.
+        # -4- Each token (string) corresponds to a sentence
+        # -5- From each sentence string we removed all punctuation.
+        #       -- SOS: We do not need spaces in their place, the sentences have already spaces where needed.
+        # -6- corpus_clean is where the new sentences are stored
+        # -7- corpus_clean is a list of sentences, where the sentences are strings.
+
         corpus_clean = corpus_clean + file_sentences
         count += 1
 
-        clear_output(wait = True)
-        print('File ' + file + ' finished. Completed ' + str(round(count*100/total,2)) + '%')
+        clear_output(wait=True)
+        print('File ' + file + ' finished. Completed ' + str(round(count * 100 / total, 2)) + '%')
 
+    # Save the basic objects:
+    with open('corpus_original', 'wb') as f:
+        pickle.dump(corpus_original, f)
+    with open('corpus_clean', 'wb') as f:
+        pickle.dump(corpus_clean, f)
+# telos()
 #######################################################################################################################
 
 """
@@ -123,18 +151,14 @@ Its sentences = [sent.strip() for sent in sent_tokenize(clean_text(text))]: <cla
 """
 
 #######################################################################################################################
-# Save the basic objects:
 
-if read_corpus:
-    with open('corpus_original', 'wb') as f:
-        pickle.dump(corpus_original, f)
-    with open('corpus_clean', 'wb') as f:
-        pickle.dump(corpus_clean, f)
-
-#######################################################################################################################
-
+# Apply the exact same cleansing for the whole corpus text, and keep the final result a text.
 corpus_clean_string = None
 if clean_corpus:
+
+    with open('corpus_original', 'rb') as f:
+        corpus_original = pickle.load(f)
+
     regex = re.compile('[%s]' % re.escape(string.punctuation))
     corpus_clean_string = regex.sub('', clean_text(corpus_original))
 
@@ -147,9 +171,13 @@ if clean_corpus:
 
     del corpus_original
     gc.collect()
+telos()
 
 #######################################################################################################################
 
+# TODO : INSERT HERE the datasets splitting
+
+#######################################################################################################################
 if do_tokenize:
     AllWords = word_tokenize(corpus_clean_string)
     print('-------------------------')
@@ -175,6 +203,7 @@ if do_tokenize:
 
     del corpus_clean_string, AllWords
     gc.collect()
+telos()
 
 #######################################################################################################################
 
