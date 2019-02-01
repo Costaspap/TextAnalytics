@@ -39,9 +39,9 @@ print("Imports Completed")
 read_corpus = False
 clean_corpus = False
 create_datasets = False
-do_tokenize = False
+do_tokenize = True
 # -deprecated- shortcut_1 = False
-do_vocabularies = True
+do_vocabularies = False
 do_oov = False
 shortcut_2 = True
 demo_ngrams = False
@@ -224,13 +224,17 @@ vocabulary = None
 WordCounts = None
 if do_tokenize:
 
-    with open('corpus_clean', 'rb') as f:
-        corpus_clean = pickle.load(f)
+    with open('training_set', 'rb') as f:
+        training_set = pickle.load(f)
 
-    total = len(corpus_clean)
-    for i in range(0, len(corpus_clean)):
-        AllWords = AllWords + word_tokenize(corpus_clean[i])
+    total = len(training_set)
+    clean_string_training_corpus = ''
+    # total = 100 # demo debuging size
+    for i in range(0, total):
+        sentence_words = word_tokenize(training_set[i])
+        AllWords = AllWords + sentence_words
 
+    pprint(AllWords)
     print('-------------------------')
     print('Words Tokenized.')
     print('-------------------------')
@@ -254,7 +258,7 @@ if do_tokenize:
 
     del AllWords
     gc.collect()
-# telos()
+telos()
 
 #######################################################################################################################
 
@@ -300,10 +304,16 @@ if do_vocabularies:
 telos()
 
 #######################################################################################################################
+# TODO : Until here everything is set properly. Below it may need improvements.
+
+#######################################################################################################################
 # Replace OOV words in sentences
 
 
 def split_sentence(sentence):
+    # This is the regex of where to tokenize.
+    # If \w+ was \w, it would tokenize on every single letter.
+    # However \w+ means "any repetition of letters", so it will tokenize on words, just as we want it to do.
     PATTERN = '\w+|\(|\)|\.|\,'
     tokenizer = RegexpTokenizer(pattern=PATTERN) 
     return tokenizer.tokenize(sentence)
