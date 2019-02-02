@@ -1,0 +1,3 @@
+https://www.kaggle.com/iarunava/imdb-movie-reviews-dataset/version/1#aclImdb.zip
+
+When downloaded, keep only pos and neg folders
