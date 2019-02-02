@@ -407,10 +407,42 @@ print_sentence_bigram_probs(['not','dog','space','understand','laplace'],V)
 
 
 
+## (iii) Estimate the language cross-entropy and perplexity of your models on the test subset of
+## the corpus, treating the entire test subset as a single sequence, with *start* (or *start1*,
+## *start2*) at the beginning of each sentence, and *end* at the end of each sentence. Do not
+## include probabilities of the form P(*start*|…) (or P(*start1*|…) or P(*start2*|…)) in the
+## computation of perplexity, but include probabilities of the form P(*end*|…).
 
 
+'''
+Compute corpus cross_entropy 
+& perplexity for interpoladed bi-gram
+& tri-gram LMs 
+'''
+def calculate_metrics(dataset,lamda = 0.9):
+#We should fine-tune lamda on a held-out dataset
+
+    sum_prob = 0
+    ngram_cnt = 0
+    for sent in training_set:
+        sent = ['<s>'] + ['<s>'] + sent + ['<e>'] + ['<e>']
+        for idx in range(2,len(sent)):
+            tr_prob = trigram_prob([sent[idx-2],sent[idx-1], sent[idx]],V)
+            b_prob = bigram_prob([sent[idx-1], sent[idx]],V)
+    
+            sum_prob += (lamda * math.log2(tr_prob)) +((1-lamda) * math.log2(b_prob))
+            ngram_cnt+=1 
+    
+    HC = -sum_prob / ngram_cnt
+    perpl = math.pow(2,HC)
+    print("Cross Entropy: {0:.3f}".format(HC))
+    print("perplexity: {0:.3f}".format(perpl))
+
+## (iv) Optionally combine your two models using linear interpolation (slide 10) and check if the
+## combined model performs better. 
 
 
+calculate_metrics(validation_set)
 
 
 
