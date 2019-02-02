@@ -220,38 +220,48 @@ if create_datasets:
 #######################################################################################################################
 
 AllWords = []
-vocabulary = None
-WordCounts = None
+vocabulary = set()
+WordCounts = Counter()
 if do_tokenize:
 
     with open('training_set', 'rb') as f:
         training_set = pickle.load(f)
 
     total = len(training_set)
-    clean_string_training_corpus = ''
     # total = 100 # demo debuging size
     for i in range(0, total):
         sentence_words = word_tokenize(training_set[i])
-        AllWords = AllWords + sentence_words
-
-    pprint(AllWords)
-    print('-------------------------')
-    print('Words Tokenized.')
-    print('-------------------------')
-
-    vocabulary = set(AllWords)
-    print('Vocabulary Created.')
-    print('-------------------------')
-
-    WordCounts = Counter(AllWords)
-    print('WordCounts Calculated.')
-    print('-------------------------')
+        # SOS: This was an order of magnitude faster than doing AllWords = AllWords + sentence_words
+        # readmore: https://stackoverflow.com/questions/2022031/python-append-vs-operator-on-lists-why-do-these-give-different-results
+        AllWords.append(sentence_words)
+        print("Sentence tokenized:", i)
+        # print(sentence_words)
+        if(i>1000):
+        #     pprint(AllWords)
+        #     telos()
+            break
 
     with open('AllWords', 'wb') as f:
         pickle.dump(AllWords, f)
 
+    print('-------------------------')
+    print('Words Tokenized.')
+    print('-------------------------')
+
+    for lista in AllWords:
+        vocabulary.union(set(lista))
+
     with open('vocabulary', 'wb') as f:
         pickle.dump(vocabulary, f)
+
+    print('Vocabulary Created.')
+    print('-------------------------')
+
+    for lista in AllWords:
+        WordCounts.update(set(lista))
+
+    print('WordCounts Calculated.')
+    print('-------------------------')
 
     with open('WordCounts', 'wb') as f:
         pickle.dump(WordCounts, f)
