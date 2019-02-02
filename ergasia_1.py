@@ -39,10 +39,12 @@ print("Imports Completed")
 read_corpus = False
 clean_corpus = False
 create_datasets = False
-do_tokenize = True
+do_AllWords = False
+do_vocabulary = False
+do_WordCounts = False
 # -deprecated- shortcut_1 = False
 do_vocabularies = False
-do_oov = False
+do_oov = True
 shortcut_2 = True
 demo_ngrams = False
 sample_ngrams = False
@@ -222,7 +224,7 @@ if create_datasets:
 AllWords = []
 vocabulary = set()
 WordCounts = Counter()
-if do_tokenize:
+if do_AllWords:
 
     with open('training_set', 'rb') as f:
         training_set = pickle.load(f)
@@ -236,29 +238,54 @@ if do_tokenize:
         AllWords.append(sentence_words)
         print("Sentence tokenized:", i)
         # print(sentence_words)
-        if(i>1000):
+        # if(i>10):
         #     pprint(AllWords)
         #     telos()
-            break
+        #     break
 
     with open('AllWords', 'wb') as f:
         pickle.dump(AllWords, f)
-
+    # pprint(AllWords)
     print('-------------------------')
     print('Words Tokenized.')
     print('-------------------------')
+# telos()
 
+if do_vocabulary:
+
+    with open('AllWords', 'rb') as f:
+        AllWords = pickle.load(f)
+
+    count = 0
+    AllWords_oneList = []
     for lista in AllWords:
-        vocabulary.union(set(lista))
+        count = count + 1
+        AllWords_oneList += lista
+        print("Sentence:", count)
 
+    vocabulary = set(AllWords_oneList)
     with open('vocabulary', 'wb') as f:
         pickle.dump(vocabulary, f)
+    pprint(vocabulary)
 
     print('Vocabulary Created.')
     print('-------------------------')
+# telos()
 
+if do_WordCounts:
+
+    with open('AllWords', 'rb') as f:
+        AllWords = pickle.load(f)
+
+    count = 0
+    AllWords_oneList = []
     for lista in AllWords:
-        WordCounts.update(set(lista))
+        count = count + 1
+        AllWords_oneList += lista
+        print("Sentence:", count)
+
+    WordCounts.update(AllWords_oneList)
+    # pprint(WordCounts)
 
     print('WordCounts Calculated.')
     print('-------------------------')
@@ -268,7 +295,7 @@ if do_tokenize:
 
     del AllWords
     gc.collect()
-telos()
+# telos()
 
 #######################################################################################################################
 
@@ -301,6 +328,9 @@ if do_vocabularies:
     with open('vocabulary', 'rb') as f:
         vocabulary = pickle.load(f)
 
+    with open('WordCounts', 'rb') as f:
+        WordCounts = pickle.load(f)
+
     valid_vocabulary = [k for k, v in WordCounts.items() if v > 10]
     invalid_vocabulary = [k for k, v in WordCounts.items() if v <= 10]
     print("valid voc", len(valid_vocabulary))
@@ -311,7 +341,7 @@ if do_vocabularies:
 
     with open('invalid_vocabulary', 'wb') as f:
         pickle.dump(invalid_vocabulary, f)
-telos()
+# telos()
 
 #######################################################################################################################
 # TODO : Until here everything is set properly. Below it may need improvements.
@@ -345,9 +375,9 @@ if do_oov:
             corpus_clean[i] = new_sent
         clear_output(wait = True)
         print('Sentences processed ' + str(i+1) + ' out of ' + str(total))
-        dummy_count = dummy_count + 1
-        if 1000 < dummy_count:
-            break
+        # dummy_count = dummy_count + 1
+        # if 1000 < dummy_count:
+        #     break
     # Have it here, in order to not to forget to save after the big computation burden.
     with open('corpus_clean_no_OOV', 'wb') as f:
         pickle.dump(corpus_clean, f)
