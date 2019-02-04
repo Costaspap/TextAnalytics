@@ -1,0 +1,13 @@
+https://www.kaggle.com/iarunava/imdb-movie-reviews-dataset/version/1#aclImdb.zip
+
+When downloaded, keep only pos and neg folders
+
+
+
+We can also use this
+
+https://www.kaggle.com/marklvl/sentiment-labelled-sentences-data-set
+
+it has labelled data from many different sources. 
+
+Or we could use both. :P
