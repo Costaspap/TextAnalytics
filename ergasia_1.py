@@ -363,6 +363,13 @@ def split_sentence(sentence):
 # kai ekei kata lathos to ekana lista apo listes apo words..
 
 if do_oov:
+
+    with open('corpus_clean', 'rb') as f:
+        corpus_clean = pickle.load(f)
+
+    with open('valid_vocabulary', 'rb') as f:
+        valid_vocabulary = pickle.load(f)
+
     dummy_count = 0
     total = len(corpus_clean)
     for i in range(0,len(corpus_clean)):
@@ -381,6 +388,7 @@ if do_oov:
     # Have it here, in order to not to forget to save after the big computation burden.
     with open('corpus_clean_no_OOV', 'wb') as f:
         pickle.dump(corpus_clean, f)
+telos()
 
 #######################################################################################################################
 # Deprecated (slower)
