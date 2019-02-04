@@ -44,7 +44,7 @@ do_vocabulary = False
 do_WordCounts = False
 # -deprecated- shortcut_1 = False
 do_vocabularies = False
-do_oov = True
+do_oov = False
 shortcut_2 = True
 demo_ngrams = False
 sample_ngrams = False
@@ -362,7 +362,7 @@ def split_sentence(sentence):
 # otan ekana antikatastash twn UNK to ekana mono se 10k records
 # kai ekei kata lathos to ekana lista apo listes apo words..
 
-if do_oov:
+if do_oov:  # TODO : This section worked, but needs extreme
 
     with open('corpus_clean', 'rb') as f:
         corpus_clean = pickle.load(f)
@@ -388,7 +388,7 @@ if do_oov:
     # Have it here, in order to not to forget to save after the big computation burden.
     with open('corpus_clean_no_OOV', 'wb') as f:
         pickle.dump(corpus_clean, f)
-telos()
+# telos()
 
 #######################################################################################################################
 # Deprecated (slower)
@@ -417,7 +417,6 @@ valid_vocabulary = None
 invalid_vocabulary = None
 corpus_clean_no_OOV = None
 C = None
-
 if shortcut_2:
     # Load objects
 
@@ -593,11 +592,12 @@ def split_into_trigrams(sentence, pad=True, s1= "start1", s2= 'start2', e='end')
     return ngs
 
 
+print("\n Printing section 1:")
 sentence = corpus_clean_no_OOV[0]
 print(sentence)
 print(split_into_bigrams(sentence))
 print(split_into_trigrams(sentence))
-
+# telos()
 #######################################################################################################################
 # -2- functions for unigram & bigram prob
 
@@ -623,6 +623,7 @@ def print_sentence_bigram_probs(sentence, vocab_size, a=0.01):
         print(bigram, np.round(100*bigram_prob(bigram, vocab_size, a),2) , " %")
 
 
+print("\n Printing section 2:")
 print("\n------------------------------")
 sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
@@ -636,7 +637,7 @@ sentence = corpus_clean_no_OOV[0] + ['next','item']
 vocab_size = len(valid_vocabulary)
 print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
 print("\n------------------------------")
-
+# telos()
 #######################################################################################################################
 # -3- functions for trigram prob (almost ready)
 
@@ -653,6 +654,7 @@ def print_sentence_trigram_probs(sentence, vocab_size, a=0.01):
         print(trigram, np.round(100*trigram_prob(trigram, vocab_size, a),2), " %")
 
 
+print("\n Printing section 3:")
 print("\n------------------------------")
 sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
@@ -662,10 +664,10 @@ sentence = corpus_clean_no_OOV[0] + ['next','item','is']
 vocab_size = len(valid_vocabulary)
 print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
 print("\n------------------------------")
-
-
+# telos()
 #######################################################################################################################
 # -4- functions for Linear interpolation
+
 
 def bigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l = 0.7):
     """
@@ -703,6 +705,7 @@ def trigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l1 = 0.7
     return trigram_linear_interpolations
 
 
+print("\n Printing section 4:")
 print("\n------------------------------")
 sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
@@ -712,10 +715,11 @@ sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
 pprint(trigram_linear_interpolation_probs(sentence, vocab_size, C))
 print("\n------------------------------")
-
+# telos()
 #######################################################################################################################
 # -5- functions for combining the above probs into making the P(t_i_k), aka the Language models
 
+# TODO : sums of logs instead of mults !!! Then explode
 
 def unigram_language_model(sentence, vocab_size, C, a = 0.01):
     language_model = 1 # neutral value
@@ -740,7 +744,7 @@ def trigram_language_model(sentence, vocab_size, a = 0.01):
 
 def bigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l = 0.7):
     language_model = 1 # neutral value
-    for pair in bigram_linear_interpolation_probs(sentence, vocab_size, C):
+    for pair in bigram_linear_interpolation_probs(sentence, vocab_size, C, a, l):
         prob = pair[1]
         language_model *= prob
     return language_model
@@ -748,23 +752,24 @@ def bigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, 
 
 def trigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l1 = 0.7, l2 = 0.2):
     language_model = 1 # neutral value
-    for pair in trigram_linear_interpolation_probs(sentence, vocab_size, C):
+    for pair in trigram_linear_interpolation_probs(sentence, vocab_size, C, a, l1, l2):
         prob = pair[1]
         language_model *= prob
     return language_model
 
 
+print("\n Printing section 5:")
 print("\n------------------------------")
 print("Language models for single sentence")
 sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
-print(np.round(unigram_language_model(sentence, vocab_size, C),2)," %")
-print(np.round(bigram_language_model(sentence, vocab_size, C),2)," %")
-print(np.round(trigram_language_model(sentence, vocab_size, C),2)," %")
-print(np.round(bigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %")
-print(np.round(trigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %")
+print(np.round(1000*unigram_language_model(sentence, vocab_size, C),2)," %%")
+print(np.round(1000*bigram_language_model(sentence, vocab_size, C),2)," %%")
+print(np.round(1000*trigram_language_model(sentence, vocab_size, C),2)," %%")
+print(np.round(1000*bigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %%")
+print(np.round(1000*trigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %%")
 print("\n------------------------------")
-
+# telos()
 #######################################################################################################################
 # -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
 
@@ -795,6 +800,7 @@ def trigram_crossentropy_perplexity(vocab_size, a=0.01):
     print("perplexity: {0:.3f}".format(perpl))
 
 
+print("\n Printing section 8:")
 print("\n------------------------------")
 print("Crossentropies & perplexities of models")
 print("debug0", corpus_clean_no_OOV[0])
@@ -802,7 +808,6 @@ vocab_size = len(valid_vocabulary)
 bigram_crossentropy_perplexity(vocab_size)
 trigram_crossentropy_perplexity(vocab_size)
 print("\n------------------------------")
-
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
