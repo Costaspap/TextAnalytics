@@ -6,7 +6,7 @@
 from nltk import sent_tokenize, word_tokenize
 from IPython.display import clear_output
 from collections import Counter
-ifrom nltk.tokenize import RegexpTokenizer
+from nltk.tokenize import RegexpTokenizer
 from nltk.util import ngrams
 
 
