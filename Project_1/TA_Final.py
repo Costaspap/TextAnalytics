@@ -3,32 +3,24 @@
 #######################################################################################################################
 
 
-import re
-import os
-import string
 from nltk import sent_tokenize, word_tokenize
 from IPython.display import clear_output
 from collections import Counter
-import gc
-import pickle
-from nltk.tokenize import RegexpTokenizer
+ifrom nltk.tokenize import RegexpTokenizer
 from nltk.util import ngrams
 
 
 from pprint import pprint
-import time
-import sys
-import math
+import time, sys, math, re, os, string, gc, pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
-
 
 
 ########## Select Run Mode. If load, it loads the preprocessed files. If create, it creates everything from scratch #######
 
 
-mode = 'Create'
-#mode = 'Load'
+#mode = 'Create'
+mode = 'Load'
 
 def clean_text(text):
     """ 
@@ -339,15 +331,17 @@ if mode == 'Load':
     print('Counters Loaded')
 
 
-
-## ii)  Check the log-probabilities that your trained models return when given (correct) sentences
-##      from the test subset vs. (incorrect) sentences of the same length (in words) consisting of
-##      randomly selected vocabulary words. 
-
+######################################################################################################################
+## ii)  Check the log-probabilities that your trained models return when given (correct) sentence                   ## 
+##      from the test subset vs. (incorrect) sentences of the same length (in words) consisting of                  ##
+##      randomly selected vocabulary words.                                                                         ##
+######################################################################################################################
 
 
 def unigram_prob(ngram, vocab_size, C, a=0.01):
     x = ngram[0]
+    
+    # Tackle cases where the gram doesn't exist in the training counter
     try:
         out = (unigrams_training_counter[(x,)] + a) / (C + a*vocab_size)
     except:
@@ -359,49 +353,91 @@ def bigram_prob(ngram, vocab_size, a=0.01):
     x = ngram[0]
     y = ngram[1]
     
-    try:
-        out = (bigrams_training_counter[(x,y)] + a) / (unigrams_training_counter[(x,)] + a*vocab_size)
-    except:
-        out = (a) / (a*vocab_size)
+    if (x,y) not in bigrams_training_counter:
+        out = a
+    else:
+        out = (bigrams_training_counter[(x,y)] + a)
+
+    # Tackle cases where the gram doesn't exist in the training counter
+    if (x,) not in unigrams_training_counter:
+        out *= 1 / (a*vocab_size)
+    else:
+        out *=  1 / (unigrams_training_counter[(x,)] + a*vocab_size)
+        
     return out
+
 
 def trigram_prob(ngram, vocab_size, a=0.01):
     x = ngram[0]
     y = ngram[1]
     z = ngram[2]
     
-    try:
-        out = (trigrams_training_counter[(x,y,z)] + a) / (bigrams_training_counter[(x,y,)] + a*vocab_size)
-    except:
-        out = a / (a*vocab_size)
+    if (x,y,z) not in trigrams_training_counter:
+        out = a
+    else:
+        out = (trigrams_training_counter[(x,y,z)] + a)
+
+    # Tackle cases where the gram doesn't exist in the training counter
+    if (x,y,) not in bigrams_training_counter:
+        out *= 1 / (a*vocab_size)
+    else:
+        out *=  1 / (bigrams_training_counter[(x,y,)] + a*vocab_size)
+        
     return out
 
 
 
 
+
+
 def print_sentence_unigram_probs(sentence, vocab_size, C, a=0.01):
+    sum_prob = 0
     for unigram in split_into_unigrams(sentence):
-        print(unigram, np.round(100*unigram_prob(unigram, vocab_size, C, a),2) , " %")
+        sum_prob += math.log2(unigram_prob(unigram, vocab_size, C, a))
+    print('Unigram log Prob of sentence: ',str(sum_prob))
 
 def print_sentence_bigram_probs(sentence, vocab_size, a=0.01):
+    sum_prob = 0
     for bigram in split_into_bigrams(sentence):
-        print(bigram, np.round(100*bigram_prob(bigram, vocab_size, a),2) , " %")
+        sum_prob += math.log2(bigram_prob(bigram, vocab_size, a))
+    print('Bigram log Prob of sentence: ',str(sum_prob))
 
 def print_sentence_trigram_probs(sentence, vocab_size, a=0.01):
+    sum_prob = 0
     for trigram in split_into_trigrams(sentence):
-        print(trigram, np.round(100*trigram_prob(trigram, vocab_size, a),2), " %")
+        sum_prob += math.log2(trigram_prob(trigram, vocab_size, a))
+    print('Trigram log Prob of sentence: ',str(sum_prob))
 
 
+## Test 10 random sentences in the test1 set against 10 sentences randomly created from the vocabulary
 
-## Test a normal Sentence
+np.random.seed(666)
 
+for i in range(0,10):
+    
+    # Get random normal sentence
+    print('-----------------------------------------------------------------------------')
+    print('Test ',str(i))
+    print('Normal sentence results:')
+    sentence_idx = np.random.randint(low = 0, high = len(test1_set))
+    
+    valid_sentence = test1_set[sentence_idx]
+    
+    print_sentence_unigram_probs(valid_sentence,V,C)
+    print_sentence_bigram_probs(valid_sentence,V)
+    print_sentence_trigram_probs(valid_sentence,V)
 
-print_sentence_bigram_probs(validation_set[6],V)
-
-## VS a non-sense sentence
-
-print_sentence_bigram_probs(['not','dog','space','understand','laplace'],V)
-
+## VS a randomly created non-sense sentence
+    print()
+    print('Invalid sentence results:')
+    
+    random_sent_idx = np.random.randint(low = 0, high = len(vocabulary), size = len(valid_sentence)) 
+    
+    invalid_sentence = [vocabulary[idx] for idx in random_sent_idx]
+    print_sentence_unigram_probs(invalid_sentence,V,C)
+    print_sentence_bigram_probs(invalid_sentence,V)
+    print_sentence_trigram_probs(invalid_sentence,V)
+    print('-----------------------------------------------------------------------------')
 
 
 
@@ -419,20 +455,23 @@ Compute corpus cross_entropy
 & perplexity for interpoladed bi-gram
 & tri-gram LMs 
 '''
+
+
 def calculate_metrics(dataset,lamda = 0.9):
 #We should fine-tune lamda on a held-out dataset
 
     sum_prob = 0
     ngram_cnt = 0
-    for sent in training_set:
+    for sent in dataset:
         sent = ['<s>'] + ['<s>'] + sent + ['<e>'] + ['<e>']
         for idx in range(2,len(sent)):
             tr_prob = trigram_prob([sent[idx-2],sent[idx-1], sent[idx]],V)
             b_prob = bigram_prob([sent[idx-1], sent[idx]],V)
-    
-            sum_prob += (lamda * math.log2(tr_prob)) +((1-lamda) * math.log2(b_prob))
-            ngram_cnt+=1 
-    
+            
+            if sent[idx-2] != ['<s>'] and sent[idx-1] != ['<s>']:
+                sum_prob += (lamda * math.log2(tr_prob)) +((1-lamda) * math.log2(b_prob))
+                ngram_cnt+=1 
+
     HC = -sum_prob / ngram_cnt
     perpl = math.pow(2,HC)
     print("Cross Entropy: {0:.3f}".format(HC))
@@ -442,7 +481,20 @@ def calculate_metrics(dataset,lamda = 0.9):
 ## combined model performs better. 
 
 
-calculate_metrics(validation_set)
+for l in range(1,9):
+    print('-----------------------------------------------------------------------------')
+    print('For lambda = ',str(l/10))
+    calculate_metrics(test1_set,l/10)
+    print('-----------------------------------------------------------------------------')
 
 
-
+for l in range(90,100,1):
+    print('-----------------------------------------------------------------------------')
+    print('For lambda = ',str(l/100))
+    calculate_metrics(test1_set,l/100)
+    print('-----------------------------------------------------------------------------')
+    
+    
+    
+    
+calculate_metrics(test1_set,1)
