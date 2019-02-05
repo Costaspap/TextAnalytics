@@ -45,9 +45,10 @@ do_WordCounts = False
 # -deprecated- shortcut_1 = False
 do_vocabularies = False
 do_oov = False
-shortcut_2 = True
+loading_point = True
 demo_ngrams = False
 sample_ngrams = False
+show_bugs = False
 
 #######################################################################################################################
 
@@ -84,8 +85,8 @@ def telos():
 corpus_original : a string with the whole corpus text uncleansed.
 corpus_clean : a list of cleansed strings, where each string is a cleansed corpus sentence,
                 where only single spaces and no punctuation exists.
-corpus_clean_string : a string with the whole corpus text cleansed, with the cleansing of corpus_clean
 """
+# Deprecated: corpus_clean_string : a string with the whole corpus text cleansed, with the cleansing of corpus_clean
 
 #######################################################################################################################
 corpus_clean = []
@@ -344,9 +345,6 @@ if do_vocabularies:
 # telos()
 
 #######################################################################################################################
-# TODO : Until here everything is tested twice properly. Below it may need improvements (tested once).
-
-#######################################################################################################################
 # Replace OOV words in sentences
 
 
@@ -362,7 +360,7 @@ def split_sentence(sentence):
 # otan ekana antikatastash twn UNK to ekana mono se 10k records
 # kai ekei kata lathos to ekana lista apo listes apo words..
 
-if do_oov:  # TODO : This section worked, but needs extreme
+if do_oov:  # TODO: This section worked, but needs refactoring in order to use valid_vocabulary as dict and not as list.
 
     with open('corpus_clean', 'rb') as f:
         corpus_clean = pickle.load(f)
@@ -391,6 +389,13 @@ if do_oov:  # TODO : This section worked, but needs extreme
 # telos()
 
 #######################################################################################################################
+"""
+corpus_clean_no_OOV : A list of lists of string tokens = a list of lists of words = a list of sentences, 
+                        where each sentence is a list of string words.
+"""
+#######################################################################################################################
+
+#######################################################################################################################
 # Deprecated (slower)
 #
 # Replace OOV words in sentences
@@ -401,23 +406,12 @@ if do_oov:  # TODO : This section worked, but needs extreme
 #   clear_output(wait = True)
 #   print('Sentences processed ' + str(i+1) + ' out of ' + str(total) )
 #######################################################################################################################
-# Creating the n-grams at this stage is actually not needed!! Only counting them is!!
-#
-# tokens = AllWords
-# bigrams = [ gram for gram in ngrams(tokens, 2) ]
-# trigrams = [ gram for gram in ngrams(tokens, 3) ]
-# #pprint(bigrams)
-# with open('bigrams', 'wb') as f:
-#     pickle.dump(bigrams, f)
-# with open('trigrams', 'wb') as f:
-#    pickle.dump(bigrams, f)
-#######################################################################################################################
 
 valid_vocabulary = None
 invalid_vocabulary = None
 corpus_clean_no_OOV = None
 C = None
-if shortcut_2:
+if loading_point:
     # Load objects
 
     with open('invalid_vocabulary', 'rb') as f:
@@ -432,63 +426,6 @@ if shortcut_2:
 
     with open('corpus_clean_no_OOV', 'rb') as f:
         corpus_clean_no_OOV = pickle.load(f)
-
-#######################################################################################################################
-
-# demo_ngrams = False
-# if demo_ngrams:
-#     print(corpus_clean_no_OOV.__class__)
-#     print(corpus_clean_no_OOV[0])
-#     print(corpus_clean_no_OOV[0].__class__)
-#     print(corpus_clean_no_OOV[0][0].__class__)
-#
-#     print(AllWords.__class__)
-#     print(AllWords[0])
-#     print(AllWords[0].__class__)
-#     print(AllWords[0:10])
-#
-#     gc.collect()
-#
-#     # Single sentence, for testing corpus_clean_no_OOV:
-#     unigram_counter = Counter()
-#     unigram_counter.update([gram for gram in ngrams(corpus_clean_no_OOV[0], 1, pad_left=True, pad_right=True,
-#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-#     pprint(corpus_clean_no_OOV[0])
-#     pprint(unigram_counter)
-#
-#     # Single sentence for testing AllWords:
-#     unigram_counter = Counter()
-#     unigram_counter.update([gram for gram in ngrams(AllWords[0:10], 1, pad_left=True, pad_right=True,
-#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-#     pprint(AllWords[0:10])
-#     pprint(unigram_counter)
-
-#######################################################################################################################
-
-# unigram_counter = Counter()
-# bigram_counter = Counter()
-# trigram_counter = Counter()
-# sample_ngrams = False
-# if sample_ngrams:
-#     print("Just started the sample ngram-ing")
-#     sample = corpus_clean_no_OOV[0:1000]
-#
-#     for sent in sample:
-#         unigram_counter.update([gram for gram in ngrams(sent, 1, pad_left=True, pad_right=True,
-#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-#     #pprint(unigram_counter)
-#
-#     for sent in sample:
-#         bigram_counter.update([gram for gram in ngrams(sent, 2, pad_left=True, pad_right=True,
-#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-#     # pprint(bigram_counter)
-#
-#     sample = corpus_clean_no_OOV[0:1000]
-#     for sent in sample:
-#         trigram_counter.update([gram for gram in ngrams(sent, 3, pad_left=True, pad_right=True,
-#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
-#     # pprint(trigram_counter)
-#     print("Just ended the sample ngram-ing")
 
 #######################################################################################################################
 # Theory explained:
@@ -520,29 +457,8 @@ if shortcut_2:
 #
 #######################################################################################################################
 
-# '''
-# Calculate the probability
-# of bigram ('the', 'Department')
-# P(('the', 'Department')) = C(('the', 'Department')) + 1 / C(('the',)) + |V|
+# TODO-list:
 #
-# '''
-#
-# unigram_counter = Counter()
-# bigram_counter = Counter()
-# trigram_counter = Counter()
-# #We should fine-tune alpha on a held-out dataset
-# alpha = 0.01
-# #Calculate vocab size
-# vocab_size = len(valid_vocabulary)
-# #Bigram prob + laplace smoothing
-# bigram_prob = (bigram_counter[('the', 'Department')] +alpha) / (unigram_counter[('the',)] + alpha*vocab_size)
-# print("bigram_prob: {0:.3f} ".format(bigram_prob))
-# bigram_log_prob = math.log2(bigram_prob)
-# print("bigram_log_prob: {0:.3f}".format(bigram_log_prob) )
-
-#######################################################################################################################
-
-# TODO
 # -1- functions for spliting a sentence into all serial unigrams, bigrams & trigrams needed for the prob formulas (done)
 # -2- functions for bigram prob (done)
 # -3- functions for trigram prob (done)
@@ -550,10 +466,10 @@ if shortcut_2:
 # -5- functions for combining the above probs into making the P(t_i_k), aka the Language models (done)
 # -6- function for edit distance (cancelled, out of scope)
 # -7- function for most probable sentence (cancelled, out of scope)
-# -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
+# -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (done)
 
 #######################################################################################################################
-# -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas
+# -1- function for spliting a sentence into all serial bigrams and trigrams needed for the prob formulas (done)
 
 # THESE 3 ARE A MUST:
 unigram_counter = Counter()
@@ -565,7 +481,8 @@ trigram_counter = Counter()
 
 def split_into_unigrams(sentence):
     if sentence.__class__ == str:
-        print("Error in corpus sentence!!")
+        print(sentence)
+        print("Error in corpus sentence (unigrams func)!!")
         telos()
     ngs = [gram for gram in ngrams(sentence, 1)]
     unigram_counter.update(ngs)
@@ -574,9 +491,11 @@ def split_into_unigrams(sentence):
 
 def split_into_bigrams(sentence, pad=True, s="start", e="end"):
     if sentence.__class__ == str:
-        print("Error in corpus sentence!!")
+        print("Error in corpus sentence (bigrams func)!!")
+        print(sentence)
         telos()
     list = [s]+sentence+[e] if pad else sentence
+    # print("debug_padding:",s,sentence,e)
     ngs = [gram for gram in ngrams(list, 2)]
     bigram_counter.update(ngs)
     return ngs
@@ -584,22 +503,23 @@ def split_into_bigrams(sentence, pad=True, s="start", e="end"):
 
 def split_into_trigrams(sentence, pad=True, s1= "start1", s2= 'start2', e='end'):
     if sentence.__class__ == str:
-        print("Error in corpus sentence!!")
+        print(sentence)
+        print("Error in corpus sentence (trigrams func)!!")
         telos()
     list = [s1, s2]+sentence+[e] if pad else sentence
     ngs = [gram for gram in ngrams(list, 3)]
     trigram_counter.update(ngs)
     return ngs
 
-
-print("\n Printing section 1:")
-sentence = corpus_clean_no_OOV[0]
-print(sentence)
-print(split_into_bigrams(sentence))
-print(split_into_trigrams(sentence))
+# print("\n Printing section 1:")
+# sentence = corpus_clean_no_OOV[94755]
+# print(sentence)
+# print(split_into_bigrams(sentence))
+# print(split_into_trigrams(sentence))
 # telos()
+
 #######################################################################################################################
-# -2- functions for unigram & bigram prob
+# -2- functions for unigram & bigram prob (done)
 
 
 def unigram_prob(ngram, vocab_size, C, a=0.01):
@@ -623,23 +543,24 @@ def print_sentence_bigram_probs(sentence, vocab_size, a=0.01):
         print(bigram, np.round(100*bigram_prob(bigram, vocab_size, a),2) , " %")
 
 
-print("\n Printing section 2:")
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0]
-vocab_size = len(valid_vocabulary)
-print_sentence_unigram_probs(sentence, vocab_size, C, a=0.01)
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0]
-vocab_size = len(valid_vocabulary)
-print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0] + ['next','item']
-vocab_size = len(valid_vocabulary)
-print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
-print("\n------------------------------")
+# print("\n Printing section 2:")
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[94755]
+# vocab_size = len(valid_vocabulary)
+# print_sentence_unigram_probs(sentence, vocab_size, C, a=0.01)
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[94755]
+# vocab_size = len(valid_vocabulary)
+# print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[0] + ['next','item']
+# vocab_size = len(valid_vocabulary)
+# print_sentence_bigram_probs(sentence, vocab_size, a=0.01)
+# print("\n------------------------------")
 # telos()
+
 #######################################################################################################################
-# -3- functions for trigram prob (almost ready)
+# -3- functions for trigram prob (done)
 
 
 def trigram_prob(ngram, vocab_size, a=0.01):
@@ -654,19 +575,20 @@ def print_sentence_trigram_probs(sentence, vocab_size, a=0.01):
         print(trigram, np.round(100*trigram_prob(trigram, vocab_size, a),2), " %")
 
 
-print("\n Printing section 3:")
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0]
-vocab_size = len(valid_vocabulary)
-print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0] + ['next','item','is']
-vocab_size = len(valid_vocabulary)
-print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
-print("\n------------------------------")
+# print("\n Printing section 3:")
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[94755]
+# vocab_size = len(valid_vocabulary)
+# print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[0] + ['next','item','is']
+# vocab_size = len(valid_vocabulary)
+# print_sentence_trigram_probs(sentence, vocab_size, a=0.01)
+# print("\n------------------------------")
 # telos()
+
 #######################################################################################################################
-# -4- functions for Linear interpolation
+# -4- functions for Linear interpolation (done)
 
 
 def bigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l = 0.7):
@@ -677,6 +599,10 @@ def bigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l = 0.7):
     :param a:
     :return:
     """
+    if (l > 1) or (l < 0):
+        print("Error: Lambas should be 0 <= l <= 1.")
+        return False
+
     bigrams = split_into_bigrams(sentence)
     bigram_linear_interpolations = []
     for bigram in bigrams:
@@ -694,6 +620,10 @@ def trigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l1 = 0.7
     :param a:
     :return:
     """
+    if (l1+l2 > 1) or (l1 < 0) or (l2 < 0):
+        print("Error: Lambas should be 0 <= l1,l2,(l1+l2) <= 1.")
+        return False
+
     trigrams = split_into_trigrams(sentence)
     trigram_linear_interpolations = []
     for trigram in trigrams:
@@ -705,71 +635,74 @@ def trigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l1 = 0.7
     return trigram_linear_interpolations
 
 
-print("\n Printing section 4:")
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0]
-vocab_size = len(valid_vocabulary)
-pprint(bigram_linear_interpolation_probs(sentence, vocab_size, C))
-print("\n------------------------------")
-sentence = corpus_clean_no_OOV[0]
-vocab_size = len(valid_vocabulary)
-pprint(trigram_linear_interpolation_probs(sentence, vocab_size, C))
-print("\n------------------------------")
+# print("\n Printing section 4:")
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[94755]
+# vocab_size = len(valid_vocabulary)
+# pprint(bigram_linear_interpolation_probs(sentence, vocab_size, C))
+# print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[94755]
+# vocab_size = len(valid_vocabulary)
+# pprint(trigram_linear_interpolation_probs(sentence, vocab_size, C))
+# print("\n------------------------------")
 # telos()
+
 #######################################################################################################################
 # -5- functions for combining the above probs into making the P(t_i_k), aka the Language models
 
-# TODO : sums of logs instead of mults !!! Then explode
+# SOS : sums of logs instead of mults !!! Then pow, so that low numbers wont get zero.
 
-def unigram_language_model(sentence, vocab_size, C, a = 0.01):
-    language_model = 1 # neutral value
+def unigram_language_model(sentence, vocab_size, C, a=0.01):
+    language_model = 0  # neutral value
     for unigram in split_into_unigrams(sentence):
-        language_model *= unigram_prob(unigram, vocab_size, C, a)
-    return language_model
+        language_model += math.log2(unigram_prob(unigram, vocab_size, C, a))
+    return math.pow(2, language_model)
 
 
 def bigram_language_model(sentence, vocab_size, a = 0.01):
-    language_model = 1 # neutral value
+    language_model = 0 # neutral value
     for bigram in split_into_bigrams(sentence):
-        language_model *= bigram_prob(bigram, vocab_size, a)
-    return language_model
+        language_model += math.log2(bigram_prob(bigram, vocab_size, a))
+    return math.pow(2, language_model)
 
 
 def trigram_language_model(sentence, vocab_size, a = 0.01):
-    language_model = 1 # neutral value
+    language_model = 0 # neutral value
     for trigram in split_into_trigrams(sentence):
-        language_model *= trigram_prob(trigram, vocab_size, a)
-    return language_model
+        language_model += math.log2(trigram_prob(trigram, vocab_size, a))
+    return math.pow(2, language_model)
 
 
 def bigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l = 0.7):
-    language_model = 1 # neutral value
+    language_model = 0 # neutral value
     for pair in bigram_linear_interpolation_probs(sentence, vocab_size, C, a, l):
         prob = pair[1]
-        language_model *= prob
-    return language_model
+        language_model += math.log2(prob)
+    return math.pow(2, language_model)
 
 
 def trigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l1 = 0.7, l2 = 0.2):
-    language_model = 1 # neutral value
+    language_model = 0 # neutral value
     for pair in trigram_linear_interpolation_probs(sentence, vocab_size, C, a, l1, l2):
         prob = pair[1]
-        language_model *= prob
-    return language_model
+        language_model += math.log2(prob)
+    return math.pow(2, language_model)
 
 
 print("\n Printing section 5:")
 print("\n------------------------------")
 print("Language models for single sentence")
-sentence = corpus_clean_no_OOV[0]
 vocab_size = len(valid_vocabulary)
-print(np.round(1000*unigram_language_model(sentence, vocab_size, C),2)," %%")
-print(np.round(1000*bigram_language_model(sentence, vocab_size, C),2)," %%")
-print(np.round(1000*trigram_language_model(sentence, vocab_size, C),2)," %%")
-print(np.round(1000*bigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %%")
-print(np.round(1000*trigram_linear_interpolation_language_model(sentence, vocab_size, C),2)," %%")
-print("\n------------------------------")
+# sentence = corpus_clean_no_OOV[0]
+for sentence in [corpus_clean_no_OOV[94755]]:
+    print(np.round(100 * unigram_language_model(sentence, vocab_size, C, a=1), 2), " %")
+    print(np.round(100 * bigram_language_model(sentence, vocab_size, a=1), 2), " %")
+    print(np.round(100 * trigram_language_model(sentence, vocab_size, a=1), 2), " %")
+    print(np.round(100 * bigram_linear_interpolation_language_model(sentence, vocab_size, C, a=1), 2), " %")
+    print(np.round(100 * trigram_linear_interpolation_language_model(sentence, vocab_size, C, a=1), 2), " %")
+    print("\n------------------------------")
 # telos()
+
 #######################################################################################################################
 # -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
 
@@ -777,7 +710,13 @@ print("\n------------------------------")
 def bigram_crossentropy_perplexity(vocab_size, a=0.01):
     sum_prob = 0
     bigram_cnt = 0
+    sentcount = -1
     for sentence in corpus_clean_no_OOV:
+    # for sentence in [corpus_clean_no_OOV[94754],corpus_clean_no_OOV[94755],corpus_clean_no_OOV[94756]]:
+        sentcount += 1
+        if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘', '•', '–', '–']):
+            # print("Erroneous Sentence", sentcount,"start:", sentence, ":end")
+            continue
         for bigram in split_into_bigrams(sentence):
             sum_prob += math.log2(bigram_prob(bigram, vocab_size, a))
             bigram_cnt += 1
@@ -790,7 +729,13 @@ def bigram_crossentropy_perplexity(vocab_size, a=0.01):
 def trigram_crossentropy_perplexity(vocab_size, a=0.01):
     sum_prob = 0
     trigram_cnt = 0
+    sentcount = -1
     for sentence in corpus_clean_no_OOV:
+    # for sentence in [corpus_clean_no_OOV[94755]]:
+        sentcount += 1
+        if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘','•','–','–']):
+            # print("Erroneous Sentence",sentcount,"start:", sentence, ":end")
+            continue
         for trigram in split_into_trigrams(sentence):
             sum_prob += math.log2(trigram_prob(trigram, vocab_size, a))
             trigram_cnt += 1
@@ -800,18 +745,100 @@ def trigram_crossentropy_perplexity(vocab_size, a=0.01):
     print("perplexity: {0:.3f}".format(perpl))
 
 
+# print(corpus_clean_no_OOV[53959])
+# print(corpus_clean_no_OOV[53966])
+# pprint(corpus_clean_no_OOV[94755])
+
 print("\n Printing section 8:")
 print("\n------------------------------")
 print("Crossentropies & perplexities of models")
-print("debug0", corpus_clean_no_OOV[0])
+# print("the first sentence:", corpus_clean_no_OOV[0])
 vocab_size = len(valid_vocabulary)
-bigram_crossentropy_perplexity(vocab_size)
-trigram_crossentropy_perplexity(vocab_size)
+bigram_crossentropy_perplexity(vocab_size, a=1)
+# trigram_crossentropy_perplexity(vocab_size, a=1)
 print("\n------------------------------")
+
+# Debug session:
+if show_bugs:
+    sntcnt = -1
+    for sentence in corpus_clean_no_OOV:
+        sntcnt +=1
+        if (sentence.__class__ == str) and sentence !='':
+            print("start",sntcnt,sentence,"end")
+    # Problematic sentences: (should have been removed at the beginning:
+    # The numbers are the sentence index in the corpus_clean_no_OOV:
+    #
+    # start 94754 ‘ end
+    # start 118178 • end
+    # start 370802 – end
+    # start 1007142 – end
+# telos()
+
+# TODO :
+# -1- Initial replacements contain mistakes, thus the need for edge conditions in the functions
+# -2- Perplexity type seems wrong
+
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 #######################################################################################################################
 # FIN
+#######################################################################################################################
+
+#######################################################################################################################
+# Demo Runs:
+#######################################################################################################################
+# demo_ngrams = False
+# if demo_ngrams:
+#     print(corpus_clean_no_OOV.__class__)
+#     print(corpus_clean_no_OOV[0])
+#     print(corpus_clean_no_OOV[0].__class__)
+#     print(corpus_clean_no_OOV[0][0].__class__)
+#
+#     print(AllWords.__class__)
+#     print(AllWords[0])
+#     print(AllWords[0].__class__)
+#     print(AllWords[0:10])
+#
+#     gc.collect()
+#
+#     # Single sentence, for testing corpus_clean_no_OOV:
+#     unigram_counter = Counter()
+#     unigram_counter.update([gram for gram in ngrams(corpus_clean_no_OOV[0], 1, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     pprint(corpus_clean_no_OOV[0])
+#     pprint(unigram_counter)
+#
+#     # Single sentence for testing AllWords:
+#     unigram_counter = Counter()
+#     unigram_counter.update([gram for gram in ngrams(AllWords[0:10], 1, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     pprint(AllWords[0:10])
+#     pprint(unigram_counter)
+#######################################################################################################################
+# unigram_counter = Counter()
+# bigram_counter = Counter()
+# trigram_counter = Counter()
+# sample_ngrams = False
+# if sample_ngrams:
+#     print("Just started the sample ngram-ing")
+#     sample = corpus_clean_no_OOV[0:1000]
+#
+#     for sent in sample:
+#         unigram_counter.update([gram for gram in ngrams(sent, 1, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     #pprint(unigram_counter)
+#
+#     for sent in sample:
+#         bigram_counter.update([gram for gram in ngrams(sent, 2, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     # pprint(bigram_counter)
+#
+#     sample = corpus_clean_no_OOV[0:1000]
+#     for sent in sample:
+#         trigram_counter.update([gram for gram in ngrams(sent, 3, pad_left=True, pad_right=True,
+#                                                        left_pad_symbol='<s>',right_pad_symbol='<e>') ])
+#     # pprint(trigram_counter)
+#     print("Just ended the sample ngram-ing")
 #######################################################################################################################
