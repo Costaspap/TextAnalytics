@@ -712,9 +712,9 @@ for sentence in [corpus_clean_no_OOV[94755]]:
 # -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
 
 
-def unigram_crossentropy_perplexity(vocab_size, C, a=0.01):
+def crossentropy_perplexity(ngram_type, vocab_size, C, a=0.01, l=0.7, l1=0.7, l2=0.2):
     sum_prob = 0
-    unigram_cnt = 0
+    ngram_cnt = 0
     sentcount = -1
     for sentence in corpus_clean_no_OOV:
     # for sentence in [corpus_clean_no_OOV[94754],corpus_clean_no_OOV[94755],corpus_clean_no_OOV[94756]]:
@@ -723,51 +723,27 @@ def unigram_crossentropy_perplexity(vocab_size, C, a=0.01):
             # print("Erroneous Sentence", sentcount,"start:", sentence, ":end")
             continue
         # These lines below are very similar to the internals of language models
-        for unigram in split_into_unigrams(sentence):
-            sum_prob += math.log2(unigram_prob(unigram, vocab_size, C, a))
-            unigram_cnt += 1
-    HC = -sum_prob / unigram_cnt
-    perpl = math.pow(2, HC)
-    print("Cross Entropy: {0:.3f}".format(HC))
-    print("perplexity: {0:.3f}".format(perpl))
-
-
-def bigram_crossentropy_perplexity(vocab_size, a=0.01):
-    sum_prob = 0
-    bigram_cnt = 0
-    sentcount = -1
-    for sentence in corpus_clean_no_OOV:
-    # for sentence in [corpus_clean_no_OOV[94754],corpus_clean_no_OOV[94755],corpus_clean_no_OOV[94756]]:
-        sentcount += 1
-        if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘', '•', '–', '–']):
-            # print("Erroneous Sentence", sentcount,"start:", sentence, ":end")
-            continue
-        # These lines below are very similar to the internals of language models
-        for bigram in split_into_bigrams(sentence):
-            sum_prob += math.log2(bigram_prob(bigram, vocab_size, a))
-            bigram_cnt += 1
-    HC = -sum_prob / bigram_cnt
-    perpl = math.pow(2, HC)
-    print("Cross Entropy: {0:.3f}".format(HC))
-    print("perplexity: {0:.3f}".format(perpl))
-
-
-def trigram_crossentropy_perplexity(vocab_size, a=0.01):
-    sum_prob = 0
-    trigram_cnt = 0
-    sentcount = -1
-    for sentence in corpus_clean_no_OOV:
-    # for sentence in [corpus_clean_no_OOV[94755]]:
-        sentcount += 1
-        if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘','•','–','–']):
-            # print("Erroneous Sentence",sentcount,"start:", sentence, ":end")
-            continue
-        # These lines below are very similar to the internals of language models
-        for trigram in split_into_trigrams(sentence):
-            prob = trigram_prob(trigram, vocab_size, a)
-            sum_prob += math.log2(prob)
-            trigram_cnt += 1
-    HC = - sum_prob / trigram_cnt
+        if ngram_type == 'unigram':
+            for ngram in split_into_unigrams(sentence):
+                sum_prob += math.log2(unigram_prob(ngram, vocab_size, C, a))
+                ngram_cnt += 1
+        elif ngram_type == 'bigram':
+            for ngram in split_into_bigrams(sentence):
+                sum_prob += math.log2(bigram_prob(ngram, vocab_size, a))
+                ngram_cnt += 1
+        elif ngram_type == 'trigram':
+            for ngram in split_into_trigrams(sentence):
+                sum_prob += math.log2(trigram_prob(ngram, vocab_size, a))
+                ngram_cnt += 1
+        elif ngram_type == 'lin_pol_bi':
+            sum_prob += math.log2(bigram_linear_interpolation_language_model(sentence, vocab_size, C, a, l))
+            for ngram in split_into_bigrams(sentence):
+                ngram_cnt += 1
+        elif ngram_type == 'lin_pol_tri':
+            sum_prob += math.log2(trigram_linear_interpolation_language_model(sentence, vocab_size, C, a, l1, l2))
+            for ngram in split_into_bigrams(sentence):
+                ngram_cnt += 1
+    HC = -sum_prob / ngram_cnt
     perpl = math.pow(2, HC)
     print("Cross Entropy: {0:.3f}".format(HC))
     print("perplexity: {0:.3f}".format(perpl))
@@ -801,11 +777,20 @@ print("\n Printing section 8:")
 print("\n------------------------------")
 print("Crossentropies & perplexities of models")
 vocab_size = len(valid_vocabulary)
-unigram_crossentropy_perplexity(vocab_size, C, a=1)
-bigram_crossentropy_perplexity(vocab_size, a=1)
-trigram_crossentropy_perplexity(vocab_size, a=1)
-print("\n------------------------------")
+for ngram_type in ['unigram','bigram','trigram','lin_pol_bi','lin_pol_tri']:
+    crossentropy_perplexity(ngram_type, vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
+    print("\n------------------------------")
 
+# Crossentropies & perplexities of models - Outputs
+#   unigrams:
+#       Cross Entropy: 5.546
+#       perplexity: 46.709
+#   bigrams:
+#       Cross Entropy: 8.831
+#       perplexity: 455.308
+#   trigrams:
+#       Cross Entropy: 10.251
+#       perplexity: 1218.641
 
 # TODO :
 # -1- Initial replacements contain mistakes, thus the need for edge conditions in the functions
