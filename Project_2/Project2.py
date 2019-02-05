@@ -141,8 +141,8 @@ with open('clean_data', 'rb') as f:
 
         
         
-X_Train, X_Tune, Y_Train, Y_Tune = train_test_split(data['Review'].values, 
-                 data['Class'].values,        
+X_Train, X_Tune, Y_Train, Y_Tune = train_test_split(clean_data['Review'].values, 
+                 clean_data['Class'].values,        
                  test_size=0.70)
         
         
