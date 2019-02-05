@@ -432,7 +432,7 @@ if loading_point:
 #######################################################################################################################
 #
 #  Language model =
-#   P(w_i_k):=
+#   P(w_1_k):=
 #   for bigrams:= P(w_1|start)*P(w_2|w_1)*..*P(w_k|w_k-1) =
 #       where P(w_k|w_k-1) = [c(w_k-1,w_k) + a] / [c(w_k-1 + a*|V|] =
 #       e.g. P(('the', 'Department')) = [C(('the', 'Department')) + a ] / [ C(('the',)) + a*|V| ] =
@@ -445,6 +445,11 @@ if loading_point:
 #           = trigram_prob =
 #           = (trigram_counter[('all', 'the', 'Departments')] + a) /
 #                   (bigram_counter[('all','the')] + alpha*vocab_size)
+#
+#  Language model =
+#   P(w_i_k):=
+#       for bigrams:= P(w_i|w_i-1)*P(w_i+1|w_i)*..*P(w_k|w_k-1) = ...
+#       for trigrams:= P(w_i|w_i-2,w_i-1)*P(w_i+1|w_i-1,w_i)*P(w_i+2|w_i,w_i+1)*..*P(w_k|w_k-2,w_k-1) = ...
 #
 # Most probable sentence:=
 #       t_1_k_opt = argmax{P(t_1_k | w_1_k)} =
@@ -707,6 +712,26 @@ for sentence in [corpus_clean_no_OOV[94755]]:
 # -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
 
 
+def unigram_crossentropy_perplexity(vocab_size, C, a=0.01):
+    sum_prob = 0
+    unigram_cnt = 0
+    sentcount = -1
+    for sentence in corpus_clean_no_OOV:
+    # for sentence in [corpus_clean_no_OOV[94754],corpus_clean_no_OOV[94755],corpus_clean_no_OOV[94756]]:
+        sentcount += 1
+        if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘', '•', '–', '–']):
+            # print("Erroneous Sentence", sentcount,"start:", sentence, ":end")
+            continue
+        # These lines below are very similar to the internals of language models
+        for unigram in split_into_unigrams(sentence):
+            sum_prob += math.log2(unigram_prob(unigram, vocab_size, C, a))
+            unigram_cnt += 1
+    HC = -sum_prob / unigram_cnt
+    perpl = math.pow(2, HC)
+    print("Cross Entropy: {0:.3f}".format(HC))
+    print("perplexity: {0:.3f}".format(perpl))
+
+
 def bigram_crossentropy_perplexity(vocab_size, a=0.01):
     sum_prob = 0
     bigram_cnt = 0
@@ -717,6 +742,7 @@ def bigram_crossentropy_perplexity(vocab_size, a=0.01):
         if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘', '•', '–', '–']):
             # print("Erroneous Sentence", sentcount,"start:", sentence, ":end")
             continue
+        # These lines below are very similar to the internals of language models
         for bigram in split_into_bigrams(sentence):
             sum_prob += math.log2(bigram_prob(bigram, vocab_size, a))
             bigram_cnt += 1
@@ -736,14 +762,36 @@ def trigram_crossentropy_perplexity(vocab_size, a=0.01):
         if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘','•','–','–']):
             # print("Erroneous Sentence",sentcount,"start:", sentence, ":end")
             continue
+        # These lines below are very similar to the internals of language models
         for trigram in split_into_trigrams(sentence):
-            sum_prob += math.log2(trigram_prob(trigram, vocab_size, a))
+            prob = trigram_prob(trigram, vocab_size, a)
+            sum_prob += math.log2(prob)
             trigram_cnt += 1
-    HC = -sum_prob / trigram_cnt
+    HC = - sum_prob / trigram_cnt
     perpl = math.pow(2, HC)
     print("Cross Entropy: {0:.3f}".format(HC))
     print("perplexity: {0:.3f}".format(perpl))
 
+#######################################################################################################################
+# -------------
+# Theory Again
+# -------------
+#
+#  Language model =
+#   P(w_i_k):=
+#       for bigrams:= P(w_i|w_i-1)*P(w_i+1|w_i)*..*P(w_k|w_k-1) = ...
+#       for trigrams:= P(w_i|w_i-2,w_i-1)*P(w_i+1|w_i-1,w_i)*P(w_i+2|w_i,w_i+1)*..*P(w_k|w_k-2,w_k-1) = ...
+#
+# Language entropy = - (1/N) * log2(P(w_1_N)) ,
+#   where N is:
+#       -- the number of unigrams or bigrams or trigrams in the whole corpus.
+# So log2(P(w_1_N)) == Language model P(w_1_N) for the whole corpus as a single sentence.
+# Language entropy = - (1/N) * log2(Language model at the corpus as test)
+#
+# So Language entropy can be calculated with unigram,bigram,trigram,linear_bigram & linear_trigram language models.
+#
+# So N changes depending on what language model you use to calculate the language entropy.
+#######################################################################################################################
 
 # print(corpus_clean_no_OOV[53959])
 # print(corpus_clean_no_OOV[53966])
@@ -752,12 +800,26 @@ def trigram_crossentropy_perplexity(vocab_size, a=0.01):
 print("\n Printing section 8:")
 print("\n------------------------------")
 print("Crossentropies & perplexities of models")
-# print("the first sentence:", corpus_clean_no_OOV[0])
 vocab_size = len(valid_vocabulary)
+unigram_crossentropy_perplexity(vocab_size, C, a=1)
 bigram_crossentropy_perplexity(vocab_size, a=1)
-# trigram_crossentropy_perplexity(vocab_size, a=1)
+trigram_crossentropy_perplexity(vocab_size, a=1)
 print("\n------------------------------")
 
+
+# TODO :
+# -1- Initial replacements contain mistakes, thus the need for edge conditions in the functions
+# -2- Perplexity type seems wrong
+
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+#######################################################################################################################
+# FIN
+#######################################################################################################################
+#
+#######################################################################################################################
 # Debug session:
 if show_bugs:
     sntcnt = -1
@@ -773,19 +835,8 @@ if show_bugs:
     # start 370802 – end
     # start 1007142 – end
 # telos()
-
-# TODO :
-# -1- Initial replacements contain mistakes, thus the need for edge conditions in the functions
-# -2- Perplexity type seems wrong
-
 #######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################
-#######################################################################################################################
-# FIN
-#######################################################################################################################
-
+#
 #######################################################################################################################
 # Demo Runs:
 #######################################################################################################################
