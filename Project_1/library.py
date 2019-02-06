@@ -18,10 +18,10 @@ def clean_text(text):
     return out
 
 
-def cleanse(dataset, dataset_size):
+def cleanse(dataset, dataset_size, valid_WordCounts):
     for i in range(0, dataset_size):
         for j in range(0, len(dataset[i])):
-            if dataset[i][j] not in dataset_size:
+            if dataset[i][j] not in valid_WordCounts:
                 dataset[i][j] = 'UNK'
 
 
