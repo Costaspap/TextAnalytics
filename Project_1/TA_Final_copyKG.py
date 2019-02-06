@@ -188,9 +188,9 @@ V = len(vocabulary)
 
 # For Ram optimization I dont create the lists containing the ngrams, I count them directly
 if mode == 'Create':
-    unigrams_training_counter = {}
-    bigrams_training_counter = {}
-    trigrams_training_counter = {}
+    unigrams_training_counter = Counter()
+    bigrams_training_counter = Counter()
+    trigrams_training_counter = Counter()
 
     with open('vfinal_unigrams_training_counter', 'wb') as f:
         pickle.dump(unigrams_training_counter, f)
@@ -224,17 +224,17 @@ for i in range(0, 10):
     print('Normal sentence results:')
     sentence_idx = np.random.randint(low=0, high=len(test1_set))
     valid_sentence = test1_set[sentence_idx]
-    print_sentence_unigram_probs(valid_sentence, V, C)
-    print_sentence_bigram_probs(valid_sentence, V)
-    print_sentence_trigram_probs(valid_sentence, V)
+    print_sentence_unigram_probs(valid_sentence, unigrams_training_counter, V, C)
+    print_sentence_bigram_probs(valid_sentence, unigrams_training_counter, bigrams_training_counter, V)
+    print_sentence_trigram_probs(valid_sentence, bigrams_training_counter, trigrams_training_counter, V)
     ## VS a randomly created non-sense sentence
     print()
     print('Invalid sentence results:')
     random_sent_idx = np.random.randint(low=0, high=len(vocabulary), size=len(valid_sentence))
     invalid_sentence = [vocabulary[idx] for idx in random_sent_idx]
-    print_sentence_unigram_probs(invalid_sentence, V, C)
-    print_sentence_bigram_probs(invalid_sentence, V)
-    print_sentence_trigram_probs(invalid_sentence, V)
+    print_sentence_unigram_probs(invalid_sentence, unigrams_training_counter, V, C)
+    print_sentence_bigram_probs(invalid_sentence, unigrams_training_counter, bigrams_training_counter, V)
+    print_sentence_trigram_probs(invalid_sentence, bigrams_training_counter, trigrams_training_counter, V)
     print('-----------------------------------------------------------------------------')
 
 #######################################################################################################################
@@ -255,7 +255,9 @@ print("\n------------------------------")
 print("Crossentropies & perplexities of models")
 vocab_size = len(vocabulary)
 for ngram_type in ['unigram', 'bigram', 'trigram']:
-    crossentropy_perplexity(ngram_type, vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
+    crossentropy_perplexity(test1_set, ngram_type, unigrams_training_counter,
+                            bigrams_training_counter, trigrams_training_counter,
+                            vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
     print("\n------------------------------")
 
 #######################################################################################################################
@@ -267,8 +269,12 @@ print("\n------------------------------")
 print("Crossentropies & perplexities of models")
 vocab_size = len(vocabulary)
 for ngram_type in ['lin_pol_bi', 'lin_pol_tri']:
-    crossentropy_perplexity(ngram_type, vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
+    crossentropy_perplexity(test1_set, ngram_type, unigrams_training_counter,
+                            bigrams_training_counter, trigrams_training_counter,
+                            vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
     print("\n------------------------------")
+
+sys.exit("FIN")
 
 #######################################################################################################################
 # TODO : Tuning the parameters

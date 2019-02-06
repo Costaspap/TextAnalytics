@@ -771,7 +771,7 @@ def crossentropy_perplexity(ngram_type, vocab_size, C, a=0.01, l=0.7, l1=0.7, l2
                 sum_prob += math.log2(trigram_linear_interpolation_language_model(sentence, vocab_size, C, a, l1, l2))
             except Exception:
                 ""
-            for ngram in split_into_bigrams(sentence):
+            for ngram in split_into_trigrams(sentence):
                 ngram_cnt += 1
     HC = -sum_prob / ngram_cnt
     perpl = math.pow(2, HC)
