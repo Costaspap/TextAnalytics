@@ -370,7 +370,7 @@ if do_oov:  # TODO: This section worked, but needs refactoring in order to use v
 
     dummy_count = 0
     total = len(corpus_clean)
-    for i in range(0,len(corpus_clean)):
+    for i in range(0, len(corpus_clean)):
         sentence = ''.join(corpus_clean[i]) # make it string
         splitted_sent = split_sentence(sentence)
         new_sent = []
@@ -724,7 +724,7 @@ for sentence in [corpus_clean_no_OOV[94755]]:
 # telos()
 
 #######################################################################################################################
-# -8- function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
+# -8- function for model cross-entropy & preplexity (in same function) (slides 29,30)
 
 
 def crossentropy_perplexity(ngram_type, vocab_size, C, a=0.01, l=0.7, l1=0.7, l2=0.2):
