@@ -162,6 +162,8 @@ if mode == 'Create':
         pickle.dump(vocabulary, f)
     with open('AllWords', 'wb') as f:
         pickle.dump(AllWords, f)
+    with open('WordCounts', 'wb') as f:
+            pickle.dump(WordCounts, f)
 
 
 
@@ -172,6 +174,9 @@ if mode == 'Load':
 
     with open('AllWords', 'rb') as f:
         AllWords = pickle.load(f)
+
+    with open('WordCounts', 'rb') as f:
+        WordCounts = pickle.load(f)
 
 
 #########################################################################################
