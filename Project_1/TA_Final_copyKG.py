@@ -26,7 +26,7 @@ mode = 'Create'
 if mode == 'Create':
     corpus = []
     path = input('Give me the path to en folder: ')
-    path = path if path != 'default' : os.getcwd() + '/../en/'
+    path = path if path != 'default' else os.getcwd() + '/../en/'
     sentences = []
     total = len(os.listdir(path))  # Total files
     count = 0
@@ -60,7 +60,7 @@ if mode == 'Create':
         pickle.dump(corpus, f)
 
 elif mode == 'Load':
-    with open('corpus', 'rb') as f:
+    with open('vfinal_corpus', 'rb') as f:
         corpus = pickle.load(f)
 
 #######################################################################################################################
@@ -147,13 +147,13 @@ if mode == 'Create':
     test1_set = test1_set_init.copy()
     test2_set = test2_set_init.copy()
 
-    training_set = cleanse(training_set, train_size)
+    training_set = cleanse(training_set, train_size, valid_WordCounts)
     print('Training Set Cleaned')
-    validation_set = cleanse(validation_set, validation_size)
+    validation_set = cleanse(validation_set, validation_size, valid_WordCounts)
     print('Validation Set Cleaned')
-    test1_set = cleanse(test1_set, test1_size)
+    test1_set = cleanse(test1_set, test1_size, valid_WordCounts)
     print('Test1 Set Cleaned')
-    test2_set = cleanse(test2_set, test2_size)
+    test2_set = cleanse(test2_set, test2_size, valid_WordCounts)
     print('Test2 Set Cleaned')
 
     with open('vfinal_training_set', 'wb') as f:
