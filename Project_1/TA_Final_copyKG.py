@@ -10,7 +10,7 @@ from pprint import pprint
 import time, sys, math, re, os, string, gc, pickle
 import numpy as np
 from sklearn.model_selection import train_test_split
-from .library import clean_text,bigram_prob,split_into_bigrams,bigram_language_model,\
+from Project_1.library import clean_text,bigram_prob,split_into_bigrams,bigram_language_model,\
     bigram_linear_interpolation_language_model, bigram_linear_interpolation_probs,crossentropy_perplexity,\
     print_sentence_bigram_probs,print_sentence_trigram_probs,print_sentence_unigram_probs,split_into_trigrams,\
     split_into_unigrams,trigram_language_model,trigram_linear_interpolation_language_model,\
@@ -20,12 +20,13 @@ from .library import clean_text,bigram_prob,split_into_bigrams,bigram_language_m
 # Select Run Mode. If load, it loads the preprocessed files. If create, it creates everything from scratch
 #######################################################################################################################
 
-# mode = 'Create'
-mode = 'Load'
+mode = 'Create'
+# mode = 'Load'
 
 if mode == 'Create':
     corpus = []
     path = input('Give me the path to en folder: ')
+    path = path if path != 'default' : os.getcwd() + '/../en/'
     sentences = []
     total = len(os.listdir(path))  # Total files
     count = 0
