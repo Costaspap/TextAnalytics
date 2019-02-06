@@ -20,9 +20,8 @@ from Project_1.library import clean_text,bigram_prob,split_into_bigrams,bigram_l
 # Select Run Mode. If load, it loads the preprocessed files. If create, it creates everything from scratch
 #######################################################################################################################
 
-mode = 'Create'
-# mode = 'Load'
-
+# mode = 'Create'
+mode = 'Load'
 if mode == 'Create':
     corpus = []
     path = input('Give me the path to en folder: ')
@@ -123,11 +122,15 @@ if mode == 'Create':
         pickle.dump(vocabulary, f)
     with open('vfinal_AllWords', 'wb') as f:
         pickle.dump(AllWords, f)
+    with open('vfinal_WordCounts', 'wb') as f:
+            pickle.dump(WordCounts, f)
 elif mode == 'Load':
     with open('vfinal_vocabulary', 'rb') as f:
         vocabulary = pickle.load(f)
     with open('vfinal_AllWords', 'rb') as f:
         AllWords = pickle.load(f)
+    with open('vfinal_WordCounts', 'rb') as f:
+        WordCounts = pickle.load(f)
 
 #######################################################################################################################
 # Replace OOV Words
