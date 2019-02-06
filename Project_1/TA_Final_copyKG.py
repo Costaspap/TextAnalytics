@@ -276,6 +276,33 @@ for ngram_type in ['lin_pol_bi', 'lin_pol_tri']:
 
 sys.exit("FIN")
 
+# ------------------------------
+# Outputs: (for default a,l,l1,l2 params)
+# ------------------------------
+#
+# Unigram model:
+#   Cross Entropy: 13.442
+#   perplexity: 11131.548
+#
+# Bigram model:
+#   Cross Entropy: 9.965
+#   perplexity: 999.342
+#
+# Trigram model:
+#   Cross Entropy: 11.725
+#   perplexity: 3385.887
+#
+# Linear Interpolation with Bigrams
+#   Cross Entropy: 7.303
+#   perplexity: 157.924
+#
+# Linear Interpolation with Trigrams
+#   Cross Entropy: 8.548
+#   perplexity: 374.232
+#
+# ------------------------------
+
+
 #######################################################################################################################
 # TODO : Tuning the parameters
 #######################################################################################################################
