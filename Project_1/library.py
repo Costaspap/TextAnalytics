@@ -23,6 +23,7 @@ def cleanse(dataset, dataset_size, valid_WordCounts):
         for j in range(0, len(dataset[i])):
             if dataset[i][j] not in valid_WordCounts:
                 dataset[i][j] = 'UNK'
+    return dataset
 
 
 # TODO : Costa , giati na metrame xwria ta sentences? An se enoxlei to global scope twn counters,
