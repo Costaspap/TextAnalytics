@@ -464,6 +464,159 @@ for i in range(0,10):
 ## computation of perplexity, but include probabilities of the form P(*end*|…).
 
 
+def bigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l = 0.7):
+    """
+    Due to the nature of the calculations, I return all bigram linear interpolations at once for the sentence
+    :param sentence:
+    :param vocab_size:
+    :param a:
+    :return:
+    """
+    if (l > 1) or (l < 0):
+        print("Error: Lambas should be 0 <= l <= 1.")
+        return False
+
+    bigrams = split_into_bigrams(sentence)
+    bigram_linear_interpolations = []
+    for bigram in bigrams:
+        unigram = bigram[0]
+        linear_interpolation = l * bigram_prob(bigram, vocab_size, a) + (l-1) * unigram_prob(unigram, vocab_size, C, a)
+        bigram_linear_interpolations.append([bigram, np.round(linear_interpolation,4)])
+    return bigram_linear_interpolations
+
+
+def trigram_linear_interpolation_probs(sentence, vocab_size, C, a=0.01, l1 = 0.7, l2 = 0.2):
+    """
+    Due to the nature of the calculations, I return all trigram linear interpolations at once for the sentence
+    :param sentence:
+    :param vocab_size:
+    :param a:
+    :return:
+    """
+    if (l1+l2 > 1) or (l1 < 0) or (l2 < 0):
+        print("Error: Lambas should be 0 <= l1,l2,(l1+l2) <= 1.")
+        return False
+
+    trigrams = split_into_trigrams(sentence)
+    trigram_linear_interpolations = []
+    for trigram in trigrams:
+        bigram = (trigram[0], trigram[1],)
+        unigram = bigram[0]
+        linear_interpolation = l1 * trigram_prob(trigram, vocab_size, a) + l2 * bigram_prob(bigram, vocab_size, a) +\
+                               (1 - l1 -l2) * unigram_prob(unigram, vocab_size, C, a)
+        trigram_linear_interpolations.append([trigram, np.round(linear_interpolation,4)])
+    return trigram_linear_interpolations
+
+
+# functions for combining the above probs into making the P(t_i_k), aka the Language models
+# SOS : sums of logs instead of mults !!! Then pow, so that low numbers wont get zero.
+
+
+def unigram_language_model(sentence, vocab_size, C, a=0.01):
+    language_model = 0  # neutral value
+    for unigram in split_into_unigrams(sentence):
+        try: # Skip zero probabilities (error: "ValueError: math domain error")
+            language_model += math.log2(unigram_prob(unigram, vocab_size, C, a))
+        except Exception:
+            continue
+    return math.pow(2, language_model)
+
+
+def bigram_language_model(sentence, vocab_size, a = 0.01):
+    language_model = 0 # neutral value
+    for bigram in split_into_bigrams(sentence):
+        try: # Skip zero probabilities (error: "ValueError: math domain error")
+            language_model += math.log2(bigram_prob(bigram, vocab_size, a))
+        except Exception:
+            continue
+    return math.pow(2, language_model)
+
+
+def trigram_language_model(sentence, vocab_size, a = 0.01):
+    language_model = 0 # neutral value
+    for trigram in split_into_trigrams(sentence):
+        try: # Skip zero probabilities (error: "ValueError: math domain error")
+            language_model += math.log2(trigram_prob(trigram, vocab_size, a))
+        except Exception:
+            continue
+    return math.pow(2, language_model)
+
+
+def bigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l = 0.7):
+    language_model = 0 # neutral value
+    for pair in bigram_linear_interpolation_probs(sentence, vocab_size, C, a, l):
+        prob = pair[1]
+        try: # Skip zero probabilities (error: "ValueError: math domain error")
+            language_model += math.log2(prob)
+        except Exception:
+            continue
+    return math.pow(2, language_model)
+
+
+def trigram_linear_interpolation_language_model(sentence, vocab_size, C, a=0.01, l1 = 0.7, l2 = 0.2):
+    language_model = 0 # neutral value
+    for pair in trigram_linear_interpolation_probs(sentence, vocab_size, C, a, l1, l2):
+        prob = pair[1]
+        try: # Skip zero probabilities (error: "ValueError: math domain error")
+            language_model += math.log2(prob)
+        except Exception:
+            continue
+    return math.pow(2, language_model)
+
+# function for model cross-entropy & preplexity (in same function) (slides 29,30) (almost done)
+
+
+def crossentropy_perplexity(dataset, ngram_type, vocab_size, C, a=0.01, l=0.7, l1=0.7, l2=0.2):
+    sum_prob = 0
+    ngram_cnt = 0
+    sentcount = -1
+    for sentence in dataset:
+    # for sentence in [corpus_clean_no_OOV[94754],corpus_clean_no_OOV[94755],corpus_clean_no_OOV[94756]]:
+        sentcount += 1
+        if (sentence == None) or (sentence == []) or (sentence == '') or (sentence in ['‘', '•', '–', '–']):
+            # print("Erroneous Sentence", sentcount,"start:", sentence, ":end")
+            continue
+        # These lines below are very similar to the internals of language models
+        if ngram_type == 'unigram':
+            for ngram in split_into_unigrams(sentence):
+                try:
+                    sum_prob += math.log2(unigram_prob(ngram, vocab_size, C, a))
+                except Exception:
+                    ""
+                ngram_cnt += 1
+        elif ngram_type == 'bigram':
+            for ngram in split_into_bigrams(sentence):
+                try:
+                    sum_prob += math.log2(bigram_prob(ngram, vocab_size, a))
+                except Exception:
+                    ""
+                ngram_cnt += 1
+        elif ngram_type == 'trigram':
+            for ngram in split_into_trigrams(sentence):
+                try:
+                    sum_prob += math.log2(trigram_prob(ngram, vocab_size, a))
+                except Exception:
+                    ""
+                ngram_cnt += 1
+        elif ngram_type == 'lin_pol_bi':
+            try:
+                sum_prob += math.log2(bigram_linear_interpolation_language_model(sentence, vocab_size, C, a, l))
+            except Exception:
+                ""
+            for ngram in split_into_bigrams(sentence):
+                ngram_cnt += 1
+        elif ngram_type == 'lin_pol_tri':
+            try:
+                sum_prob += math.log2(trigram_linear_interpolation_language_model(sentence, vocab_size, C, a, l1, l2))
+            except Exception:
+                ""
+            for ngram in split_into_bigrams(sentence):
+                ngram_cnt += 1
+    HC = -sum_prob / ngram_cnt
+    perpl = math.pow(2, HC)
+    print("Cross Entropy: {0:.3f}".format(HC))
+    print("perplexity: {0:.3f}".format(perpl))
+
 '''
 Compute corpus cross_entropy 
 & perplexity for interpoladed bi-gram
