@@ -58,7 +58,7 @@ if mode == 'Create':
 
         regex = re.compile('[%s]' % re.escape(string.punctuation))
         sentences = [word_tokenize(regex.sub(' ', sent).strip()) for sent in sent_tokenize(clean_text(file_text))]
-
+        # TODO : Kosta, to keno edw xreiazetai?
 
         corpus += sentences
         # What just happened in cleansing:
@@ -193,7 +193,7 @@ if mode == 'Create':
     test1_set  = test1_set_init.copy()
     test2_set  = test2_set_init.copy()
     
-    
+    # TODO : Costa, den ta kaneis auta me function gia na meiwthei to space?
     for i in range(0,train_size):
         for j in range(0,len(training_set_init[i])):
             if training_set_init[i][j] not in valid_WordCounts:
@@ -255,26 +255,38 @@ if mode == 'Load':
 C = len(AllWords)
 V = len(vocabulary)
 
+# TODO : Costa , giati na metrame xwria ta sentences? An se enoxlei to global scope twn counters,
+#   de nomizw oti einai logos anhsyxias. Epishs an ta bgaleis apo ta functions, metras kai tis skartes sentences.
 def split_into_unigrams(sentence):
     if sentence.__class__ == str:
-        print("Error in corpus sentence!!")
+        print(sentence)
+        print("Error in corpus sentence (unigrams func)!!")
+        sys.exit("Requested Exit.")
     ngs = [gram for gram in ngrams(sentence, 1)]
+    unigram_counter.update(ngs)
     return ngs
 
 
 def split_into_bigrams(sentence, pad=True, s="start", e="end"):
     if sentence.__class__ == str:
-        print("Error in corpus sentence!!")
+        print("Error in corpus sentence (bigrams func)!!")
+        print(sentence)
+        sys.exit("Requested Exit.")
     list = [s]+sentence+[e] if pad else sentence
+    # print("debug_padding:",s,sentence,e)
     ngs = [gram for gram in ngrams(list, 2)]
+    bigram_counter.update(ngs)
     return ngs
 
 
 def split_into_trigrams(sentence, pad=True, s1= "start1", s2= 'start2', e='end'):
     if sentence.__class__ == str:
-        print("Error in corpus sentence!!")
+        print(sentence)
+        print("Error in corpus sentence (trigrams func)!!")
+        sys.exit("Requested Exit.")
     list = [s1, s2]+sentence+[e] if pad else sentence
     ngs = [gram for gram in ngrams(list, 3)]
+    trigram_counter.update(ngs)
     return ngs
 
 
@@ -286,7 +298,7 @@ if mode == 'Create':
     trigrams_training_counter = {}
     
     ###### Counters ########
-    
+    # TODO : Costa tha proteina auto na fygei
     for sentence in training_set:
         
         for unigram in split_into_unigrams(sentence):
@@ -337,6 +349,8 @@ if mode == 'Load':
 ##      randomly selected vocabulary words.                                                                         ##
 ######################################################################################################################
 
+# TODO : Costa, pws ginetai na mhn yparxei kapoio n-gram? Fovamai mhn einai to tackling edw
+# san na kryvoume kapoio lathos katw apo to xali
 
 def unigram_prob(ngram, vocab_size, C, a=0.01):
     x = ngram[0]
