@@ -250,31 +250,29 @@ Compute corpus cross_entropy
 & perplexity for interpoladed bi-gram
 & tri-gram LMs 
 '''
-
-print("\n------------------------------")
-print("Crossentropies & perplexities of models")
-vocab_size = len(vocabulary)
-for ngram_type in ['unigram', 'bigram', 'trigram']:
-    crossentropy_perplexity(test1_set, ngram_type, unigrams_training_counter,
-                            bigrams_training_counter, trigrams_training_counter,
-                            vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
-    print("\n------------------------------")
+#
+# print("\n------------------------------")
+# print("Crossentropies & perplexities of models")
+# vocab_size = len(vocabulary)
+# for ngram_type in ['unigram', 'bigram', 'trigram']:
+#     crossentropy_perplexity(test1_set, ngram_type, unigrams_training_counter,
+#                             bigrams_training_counter, trigrams_training_counter,
+#                             vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
+#     print("\n------------------------------")
 
 #######################################################################################################################
 # (iv) Optionally combine your two models using linear interpolation (slide 10) and check if the
 # combined model performs better.
 #######################################################################################################################
 
-print("\n------------------------------")
-print("Crossentropies & perplexities of models")
-vocab_size = len(vocabulary)
-for ngram_type in ['lin_pol_bi', 'lin_pol_tri']:
-    crossentropy_perplexity(test1_set, ngram_type, unigrams_training_counter,
-                            bigrams_training_counter, trigrams_training_counter,
-                            vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
-    print("\n------------------------------")
-
-sys.exit("FIN")
+# print("\n------------------------------")
+# print("Crossentropies & perplexities of models")
+# vocab_size = len(vocabulary)
+# for ngram_type in ['lin_pol_bi', 'lin_pol_tri']:
+#     crossentropy_perplexity(test1_set, ngram_type, unigrams_training_counter,
+#                             bigrams_training_counter, trigrams_training_counter,
+#                             vocab_size, C, a=1, l=0.7, l1=0.7, l2=0.2)
+#     print("\n------------------------------")
 
 # ------------------------------
 # Outputs: (for default a,l,l1,l2 params)
@@ -302,22 +300,83 @@ sys.exit("FIN")
 #
 # ------------------------------
 
-
 #######################################################################################################################
-# TODO : Tuning the parameters
+# Tuning the parameters
 #######################################################################################################################
-for l in range(1,9):
-    print('-----------------------------------------------------------------------------')
-    print('For lambda = ',str(l/10))
-    calculate_metrics(test1_set,l/10)
-    print('-----------------------------------------------------------------------------')
+vocab_size = len(vocabulary)
+if mode == 'Create':
+    results_unigram = []
+    print("unigrams")
+    for a in [0.01,0.1,1,10]:
+        print("a:", a)
+        metric = crossentropy_perplexity(validation_set, 'unigram', unigrams_training_counter,
+                                bigrams_training_counter, trigrams_training_counter,
+                                vocab_size, C, a=a)
+        results_unigram.append((a,metric))
+        print("\n------------------------------")
+    with open('vfinal_results_unigram', 'wb') as f:
+        pickle.dump(results_unigram, f)
+    results_bigram = []
+    print("bigrams")
+    for a in [0.01,0.1,1,10]:
+        print("a:", a)
+        metric = crossentropy_perplexity(validation_set, 'bigram', unigrams_training_counter,
+                                bigrams_training_counter, trigrams_training_counter,
+                                vocab_size, C, a=a)
+        results_bigram.append((a, metric))
+        print("\n------------------------------")
+    with open('vfinal_results_bigram', 'wb') as f:
+        pickle.dump(results_bigram, f)
+    results_trigram = []
+    print("trigrams")
+    for a in [0.01,0.1,1,10]:
+        print("a:", a)
+        metric = crossentropy_perplexity(validation_set, 'trigram', unigrams_training_counter,
+                                bigrams_training_counter, trigrams_training_counter,
+                                vocab_size, C, a=a)
+        results_trigram.append((a, metric))
+        print("\n------------------------------")
+    with open('vfinal_results_trigram', 'wb') as f:
+        pickle.dump(results_trigram, f)
+    results_lin_pol_bi = []
+    print("lin_pol_bi")
+    for a in [0.01,0.1,1,10]:
+        for l in [0.3,0.6,0.9]:
+            print("a:",a,"l:",l)
+            metric = crossentropy_perplexity(validation_set, 'lin_pol_bi', unigrams_training_counter,
+                                bigrams_training_counter, trigrams_training_counter,
+                                vocab_size, C, a=a, l=l)
+            results_lin_pol_bi.append(((a, l), metric))
+            print("\n------------------------------")
+    with open('vfinal_results_lin_pol_bi', 'wb') as f:
+        pickle.dump(results_lin_pol_bi, f)
+    results_lin_pol_tri = []
+    print("lin_pol_tri")
+    for a in [0.01,0.1,1,10]:
+        for (l1,l2) in [(0.3,0.6),(0.6,0.3),(0.4,0.4)]:
+            print("a:",a,"l1:",l1,"l2:",l2)
+            metric = crossentropy_perplexity(validation_set, 'lin_pol_tri', unigrams_training_counter,
+                                bigrams_training_counter, trigrams_training_counter,
+                                vocab_size, C, a=a, l1=l1, l2=l2)
+            results_lin_pol_tri.append(((a, l1, l2), metric))
+            print("\n------------------------------")
+    with open('vfinal_results_lin_pol_tri', 'wb') as f:
+        pickle.dump(results_lin_pol_tri, f)
 
+elif mode == 'Load':
+    with open('vfinal_results_unigram', 'rb') as f:
+        results_unigram = pickle.load(f)
+    with open('vfinal_results_bigram', 'rb') as f:
+        results_bigram = pickle.load(f)
+    with open('vfinal_results_trigram', 'rb') as f:
+        results_trigram = pickle.load(f)
+    with open('vfinal_lin_pol_bi', 'rb') as f:
+        results_lin_pol_bi = pickle.load(f)
+    with open('vfinal_results_lin_pol_tri', 'rb') as f:
+        results_lin_pol_tri = pickle.load(f)
+    print('Perplexity Results Loaded')
+#######################################################################################################################
 
-for l in range(90,100,1):
-    print('-----------------------------------------------------------------------------')
-    print('For lambda = ',str(l/100))
-    calculate_metrics(test1_set,l/100)
-    print('-----------------------------------------------------------------------------')
-    
+sys.exit("FIN")
 #######################################################################################################################
 #######################################################################################################################
