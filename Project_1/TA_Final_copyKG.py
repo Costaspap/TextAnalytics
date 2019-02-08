@@ -304,40 +304,41 @@ Compute corpus cross_entropy
 # Tuning the parameters
 #######################################################################################################################
 vocab_size = len(vocabulary)
+mode = 'Create'
 if mode == 'Create':
-    results_unigram = []
-    print("unigrams")
-    for a in [0.01,0.1,1,10]:
-        print("a:", a)
-        metric = crossentropy_perplexity(validation_set, 'unigram', unigrams_training_counter,
-                                bigrams_training_counter, trigrams_training_counter,
-                                vocab_size, C, a=a)
-        results_unigram.append((a,metric))
-        print("\n------------------------------")
-    with open('vfinal_results_unigram', 'wb') as f:
-        pickle.dump(results_unigram, f)
-    results_bigram = []
-    print("bigrams")
-    for a in [0.01,0.1,1,10]:
-        print("a:", a)
-        metric = crossentropy_perplexity(validation_set, 'bigram', unigrams_training_counter,
-                                bigrams_training_counter, trigrams_training_counter,
-                                vocab_size, C, a=a)
-        results_bigram.append((a, metric))
-        print("\n------------------------------")
-    with open('vfinal_results_bigram', 'wb') as f:
-        pickle.dump(results_bigram, f)
-    results_trigram = []
-    print("trigrams")
-    for a in [0.01,0.1,1,10]:
-        print("a:", a)
-        metric = crossentropy_perplexity(validation_set, 'trigram', unigrams_training_counter,
-                                bigrams_training_counter, trigrams_training_counter,
-                                vocab_size, C, a=a)
-        results_trigram.append((a, metric))
-        print("\n------------------------------")
-    with open('vfinal_results_trigram', 'wb') as f:
-        pickle.dump(results_trigram, f)
+    # results_unigram = []
+    # print("unigrams")
+    # for a in [0.01,0.1,1,10]:
+    #     print("a:", a)
+    #     metric = crossentropy_perplexity(validation_set, 'unigram', unigrams_training_counter,
+    #                             bigrams_training_counter, trigrams_training_counter,
+    #                             vocab_size, C, a=a)
+    #     results_unigram.append((a,metric))
+    #     print("\n------------------------------")
+    # with open('vfinal_results_unigram', 'wb') as f:
+    #     pickle.dump(results_unigram, f)
+    # results_bigram = []
+    # print("bigrams")
+    # for a in [0.01,0.1,1,10]:
+    #     print("a:", a)
+    #     metric = crossentropy_perplexity(validation_set, 'bigram', unigrams_training_counter,
+    #                             bigrams_training_counter, trigrams_training_counter,
+    #                             vocab_size, C, a=a)
+    #     results_bigram.append((a, metric))
+    #     print("\n------------------------------")
+    # with open('vfinal_results_bigram', 'wb') as f:
+    #     pickle.dump(results_bigram, f)
+    # results_trigram = []
+    # print("trigrams")
+    # for a in [0.01,0.1,1,10]:
+    #     print("a:", a)
+    #     metric = crossentropy_perplexity(validation_set, 'trigram', unigrams_training_counter,
+    #                             bigrams_training_counter, trigrams_training_counter,
+    #                             vocab_size, C, a=a)
+    #     results_trigram.append((a, metric))
+    #     print("\n------------------------------")
+    # with open('vfinal_results_trigram', 'wb') as f:
+    #     pickle.dump(results_trigram, f)
     results_lin_pol_bi = []
     print("lin_pol_bi")
     for a in [0.01,0.1,1,10]:
