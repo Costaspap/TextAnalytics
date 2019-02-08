@@ -214,7 +214,8 @@ def bigram_linear_interpolation_language_model(sentence,unigram_counter, bigram_
         try:  # Skip zero probabilities (error: "ValueError: math domain error")
             language_model += math.log2(prob)
         except Exception:
-            continue
+            return 0
+            # continue
     return math.pow(2, language_model)
 
 
@@ -227,7 +228,8 @@ def trigram_linear_interpolation_language_model(sentence, unigram_counter, bigra
         try:  # Skip zero probabilities (error: "ValueError: math domain error")
             language_model += math.log2(prob)
         except Exception:
-            continue
+            return 0
+            # continue
     return math.pow(2, language_model)
 
 
