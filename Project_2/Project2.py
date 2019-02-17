@@ -137,7 +137,7 @@ X_Uni_Validation, X_Uni_Test, Y_Uni_Validation, Y_Uni_Test = train_test_split(X_
              
 del X_Uni_Tune, Y_Uni_Tune
 gc.collect()
-        
+      
 
 ########################################################################################################
 ################################# Split into Sets for BiGrams  #########################################
@@ -159,6 +159,15 @@ X_Bi_Validation, X_Bi_Test, Y_Bi_Validation, Y_Bi_Test = train_test_split(X_Bi_T
 del X_Bi_Tune, Y_Bi_Tune
 gc.collect()
         
+
+print('Unigram Training Dataset:',X_Uni_Train.shape)
+print('Unigram Validation Dataset:',X_Uni_Validation.shape)
+print('Unigram Test Dataset:',X_Uni_Test.shape)
+
+print('Bigram Training Dataset:',X_Bi_Train.shape) 
+print('Bigram Validation Dataset:',X_Bi_Validation.shape) 
+print('Bigram Test Dataset:',X_Bi_Test.shape) 
+
 
 ########################################################################################################
 ######################## Perform Truncated SVD to reduce dimensions ####################################
