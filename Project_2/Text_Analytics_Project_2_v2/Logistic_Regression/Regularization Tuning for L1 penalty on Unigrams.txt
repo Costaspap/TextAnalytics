@@ -1,0 +1,232 @@
+C: 0.1
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+84.04%
+--------------------------------------------------------------
+Validation Accuracy:
+84.96%
+--------------------------------------------------------------
+Validation Precision:
+85.29%
+--------------------------------------------------------------
+Validation Recall:
+86.58%
+--------------------------------------------------------------
+Validation F1 Score:
+85.93%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    488.0     99.0 
+    Positive     89.0    574.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.2
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+85.42%
+--------------------------------------------------------------
+Validation Accuracy:
+86.16%
+--------------------------------------------------------------
+Validation Precision:
+86.68%
+--------------------------------------------------------------
+Validation Recall:
+87.33%
+--------------------------------------------------------------
+Validation F1 Score:
+87.0%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    498.0     89.0 
+    Positive     84.0    579.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.3
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+86.56%
+--------------------------------------------------------------
+Validation Accuracy:
+87.28%
+--------------------------------------------------------------
+Validation Precision:
+87.84%
+--------------------------------------------------------------
+Validation Recall:
+88.24%
+--------------------------------------------------------------
+Validation F1 Score:
+88.04%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    506.0     81.0 
+    Positive     78.0    585.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.4
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+87.34%
+--------------------------------------------------------------
+Validation Accuracy:
+87.84%
+--------------------------------------------------------------
+Validation Precision:
+88.31%
+--------------------------------------------------------------
+Validation Recall:
+88.84%
+--------------------------------------------------------------
+Validation F1 Score:
+88.57%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    509.0     78.0 
+    Positive     74.0    589.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.5
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+87.89%
+--------------------------------------------------------------
+Validation Accuracy:
+88.32%
+--------------------------------------------------------------
+Validation Precision:
+88.87%
+--------------------------------------------------------------
+Validation Recall:
+89.14%
+--------------------------------------------------------------
+Validation F1 Score:
+89.01%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    513.0     74.0 
+    Positive     72.0    591.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.6
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+88.49%
+--------------------------------------------------------------
+Validation Accuracy:
+88.88%
+--------------------------------------------------------------
+Validation Precision:
+89.46%
+--------------------------------------------------------------
+Validation Recall:
+89.59%
+--------------------------------------------------------------
+Validation F1 Score:
+89.53%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    517.0     70.0 
+    Positive     69.0    594.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.7
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+88.96%
+--------------------------------------------------------------
+Validation Accuracy:
+88.88%
+--------------------------------------------------------------
+Validation Precision:
+89.46%
+--------------------------------------------------------------
+Validation Recall:
+89.59%
+--------------------------------------------------------------
+Validation F1 Score:
+89.53%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    517.0     70.0 
+    Positive     69.0    594.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.8
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+89.46%
+--------------------------------------------------------------
+Validation Accuracy:
+88.64%
+--------------------------------------------------------------
+Validation Precision:
+89.17%
+--------------------------------------------------------------
+Validation Recall:
+89.44%
+--------------------------------------------------------------
+Validation F1 Score:
+89.31%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    515.0     72.0 
+    Positive     70.0    593.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.9
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+89.83%
+--------------------------------------------------------------
+Validation Accuracy:
+88.96%
+--------------------------------------------------------------
+Validation Precision:
+89.24%
+--------------------------------------------------------------
+Validation Recall:
+90.05%
+--------------------------------------------------------------
+Validation F1 Score:
+89.64%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    515.0     72.0 
+    Positive     66.0    597.0 
+--------------------------------------------------------------
