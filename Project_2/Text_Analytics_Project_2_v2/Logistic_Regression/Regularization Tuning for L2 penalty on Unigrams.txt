@@ -1,0 +1,248 @@
+C: 0.1
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+88.0%
+--------------------------------------------------------------
+Validation Accuracy:
+86.64%
+--------------------------------------------------------------
+Validation Precision:
+86.58%
+--------------------------------------------------------------
+Validation Recall:
+88.54%
+--------------------------------------------------------------
+Validation F1 Score:
+87.55%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    496.0     91.0 
+    Positive     76.0    587.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.2
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+89.37%
+--------------------------------------------------------------
+Validation Accuracy:
+87.76%
+--------------------------------------------------------------
+Validation Precision:
+88.06%
+--------------------------------------------------------------
+Validation Recall:
+88.99%
+--------------------------------------------------------------
+Validation F1 Score:
+88.52%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    507.0     80.0 
+    Positive     73.0    590.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.3
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+90.3%
+--------------------------------------------------------------
+Validation Accuracy:
+88.64%
+--------------------------------------------------------------
+Validation Precision:
+88.82%
+--------------------------------------------------------------
+Validation Recall:
+89.89%
+--------------------------------------------------------------
+Validation F1 Score:
+89.36%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    512.0     75.0 
+    Positive     67.0    596.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.4
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+90.92%
+--------------------------------------------------------------
+Validation Accuracy:
+88.56%
+--------------------------------------------------------------
+Validation Precision:
+88.81%
+--------------------------------------------------------------
+Validation Recall:
+89.74%
+--------------------------------------------------------------
+Validation F1 Score:
+89.27%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    512.0     75.0 
+    Positive     68.0    595.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.5
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+91.34%
+--------------------------------------------------------------
+Validation Accuracy:
+88.96%
+--------------------------------------------------------------
+Validation Precision:
+89.24%
+--------------------------------------------------------------
+Validation Recall:
+90.05%
+--------------------------------------------------------------
+Validation F1 Score:
+89.64%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    515.0     72.0 
+    Positive     66.0    597.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.6
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+91.74%
+--------------------------------------------------------------
+Validation Accuracy:
+89.04%
+--------------------------------------------------------------
+Validation Precision:
+89.14%
+--------------------------------------------------------------
+Validation Recall:
+90.35%
+--------------------------------------------------------------
+Validation F1 Score:
+89.74%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    514.0     73.0 
+    Positive     64.0    599.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.7
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+91.99%
+--------------------------------------------------------------
+Validation Accuracy:
+89.12%
+--------------------------------------------------------------
+Validation Precision:
+89.04%
+--------------------------------------------------------------
+Validation Recall:
+90.65%
+--------------------------------------------------------------
+Validation F1 Score:
+89.84%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    513.0     74.0 
+    Positive     62.0    601.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.8
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+92.24%
+--------------------------------------------------------------
+Validation Accuracy:
+89.12%
+--------------------------------------------------------------
+Validation Precision:
+88.92%
+--------------------------------------------------------------
+Validation Recall:
+90.8%
+--------------------------------------------------------------
+Validation F1 Score:
+89.85%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    512.0     75.0 
+    Positive     61.0    602.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:1296: UserWarning: 'n_jobs' > 1 does not have any effect when 'solver' is set to 'liblinear'. Got 'n_jobs' = 4.
+  " = {}.".format(effective_n_jobs(self.n_jobs)))
+C: 0.9
+
+************************ Logistic Regression on Unigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+92.48%
+--------------------------------------------------------------
+Validation Accuracy:
+89.36%
+--------------------------------------------------------------
+Validation Precision:
+88.97%
+--------------------------------------------------------------
+Validation Recall:
+91.25%
+--------------------------------------------------------------
+Validation F1 Score:
+90.1%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    512.0     75.0 
+    Positive     58.0    605.0 
+--------------------------------------------------------------

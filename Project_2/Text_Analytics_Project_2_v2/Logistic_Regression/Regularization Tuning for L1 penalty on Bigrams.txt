@@ -1,0 +1,232 @@
+C: 0.1
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+81.63%
+--------------------------------------------------------------
+Validation Accuracy:
+81.92%
+--------------------------------------------------------------
+Validation Precision:
+82.66%
+--------------------------------------------------------------
+Validation Recall:
+83.41%
+--------------------------------------------------------------
+Validation F1 Score:
+83.03%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    471.0    116.0 
+    Positive    110.0    553.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.2
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+83.19%
+--------------------------------------------------------------
+Validation Accuracy:
+83.28%
+--------------------------------------------------------------
+Validation Precision:
+83.88%
+--------------------------------------------------------------
+Validation Recall:
+84.77%
+--------------------------------------------------------------
+Validation F1 Score:
+84.32%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    479.0    108.0 
+    Positive    101.0    562.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.3
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+84.49%
+--------------------------------------------------------------
+Validation Accuracy:
+84.08%
+--------------------------------------------------------------
+Validation Precision:
+84.73%
+--------------------------------------------------------------
+Validation Recall:
+85.37%
+--------------------------------------------------------------
+Validation F1 Score:
+85.05%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    485.0    102.0 
+    Positive     97.0    566.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.4
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+85.49%
+--------------------------------------------------------------
+Validation Accuracy:
+84.8%
+--------------------------------------------------------------
+Validation Precision:
+85.67%
+--------------------------------------------------------------
+Validation Recall:
+85.67%
+--------------------------------------------------------------
+Validation F1 Score:
+85.67%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    492.0     95.0 
+    Positive     95.0    568.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.5
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+86.18%
+--------------------------------------------------------------
+Validation Accuracy:
+86.08%
+--------------------------------------------------------------
+Validation Precision:
+87.21%
+--------------------------------------------------------------
+Validation Recall:
+86.43%
+--------------------------------------------------------------
+Validation F1 Score:
+86.82%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    503.0     84.0 
+    Positive     90.0    573.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.6
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+86.74%
+--------------------------------------------------------------
+Validation Accuracy:
+86.32%
+--------------------------------------------------------------
+Validation Precision:
+87.5%
+--------------------------------------------------------------
+Validation Recall:
+86.58%
+--------------------------------------------------------------
+Validation F1 Score:
+87.04%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    505.0     82.0 
+    Positive     89.0    574.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.7
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+87.31%
+--------------------------------------------------------------
+Validation Accuracy:
+86.4%
+--------------------------------------------------------------
+Validation Precision:
+87.75%
+--------------------------------------------------------------
+Validation Recall:
+86.43%
+--------------------------------------------------------------
+Validation F1 Score:
+87.08%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    507.0     80.0 
+    Positive     90.0    573.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.8
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+87.78%
+--------------------------------------------------------------
+Validation Accuracy:
+86.72%
+--------------------------------------------------------------
+Validation Precision:
+88.06%
+--------------------------------------------------------------
+Validation Recall:
+86.73%
+--------------------------------------------------------------
+Validation F1 Score:
+87.39%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    509.0     78.0 
+    Positive     88.0    575.0 
+--------------------------------------------------------------
+E:\Anaconda\lib\site-packages\sklearn\linear_model\logistic.py:432: FutureWarning: Default solver will be changed to 'lbfgs' in 0.22. Specify a solver to silence this warning.
+  FutureWarning)
+C: 0.9
+
+************************ Logistic Regression on Bigrams ************************
+--------------------------------------------------------------
+Training Accuracy:
+88.21%
+--------------------------------------------------------------
+Validation Accuracy:
+86.72%
+--------------------------------------------------------------
+Validation Precision:
+87.94%
+--------------------------------------------------------------
+Validation Recall:
+86.88%
+--------------------------------------------------------------
+Validation F1 Score:
+87.41%
+--------------------------------------------------------------
+Validation Confusion Matrix:
+             Negative Positive 
+    Negative    508.0     79.0 
+    Positive     87.0    576.0 
+--------------------------------------------------------------
