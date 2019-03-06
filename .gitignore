@@ -5,3 +5,15 @@ europarl.tgz
 Project_2/Project2_gkCopy.py
 Project_2/data
 Project_2/labels
+Project_3/Y_Test
+Project_3/Y_Train
+Project_3/Y_Validation
+Project_3/X_Test
+Project_3/X_Train
+Project_3/X_Validation
+Project_3/reduced_uni_test
+Project_3/reduced_uni_train
+Project_3/reduced_uni_validation
+Project_3/reduced_bi_test
+Project_3/reduced_bi_train
+Project_3/reduced_bi_validation
