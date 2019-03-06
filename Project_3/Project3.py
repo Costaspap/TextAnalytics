@@ -445,7 +445,7 @@ Score_Classifier(baseline_train, Y_Train, baseline_valid, Y_Validation, Classifi
 #######################################################
 from keras.callbacks import Callback
 from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
-from keras.regularizers import l1
+from keras.regularizers import l1, l2
 from keras.layers import LeakyReLU
 
 
@@ -473,9 +473,11 @@ metrics = Metrics()
 
 
 
-def Dense_Layer(input_tensor, n_neurons, l1_rate = 0.02, dropout_rate = 0):
-    
-    X = Dense(n_neurons, kernel_regularizer= l1(l1_rate))(input_tensor)
+def Dense_Layer(input_tensor, n_neurons, regularizer, reg_rate = 0.02, dropout_rate = 0):
+
+    k_reg = l1(reg_rate) if regularizer == 'l1' else l2(reg_rate)
+
+    X = Dense(n_neurons, kernel_regularizer= k_reg)(input_tensor)
     X = BatchNormalization(axis = -1)(X)
     X = LeakyReLU(alpha = 0.1)(X)
     X = Dropout(dropout_rate)(X)
@@ -483,7 +485,8 @@ def Dense_Layer(input_tensor, n_neurons, l1_rate = 0.02, dropout_rate = 0):
     return X
 
 
-def Create_Model(structure, l1_rate = 0, dropout_rate = 0, opt = 'adam'):
+def Create_Model(structure, regularizer, reg_rate = 0, dropout_rate = 0, opt = 'adam'):
+
     inpt = reduced_uni_train.shape[1]
     
     X_input = Input((inpt,))
@@ -491,7 +494,7 @@ def Create_Model(structure, l1_rate = 0, dropout_rate = 0, opt = 'adam'):
     
     for i in range(0,len(structure)):
         
-        X = Dense_Layer(X, structure[i], dropout_rate = dropout_rate)
+        X = Dense_Layer(X, structure[i], regularizer, dropout_rate = dropout_rate)
     
     X = BatchNormalization(axis = -1)(X)
     X =  Dense(1, activation = 'sigmoid')(X)
@@ -504,19 +507,46 @@ def Create_Model(structure, l1_rate = 0, dropout_rate = 0, opt = 'adam'):
 
 
 
+insize = reduced_uni_train.shape[1]
+structures = [
+    # [int(insize),int(np.round(insize/2,0)),int(np.round(insize/4,0))],
+    # [int(np.round(insize/2,0)), int(np.round(insize / 10,0)), int(np.round(insize / 100,0))],
+    # [int(np.round(insize / 10, 0)), int(np.round(insize / 100, 0)), int(np.round(insize / 1000, 0))],
+    [50,50,50],
+    [10,50,100],
+    [100,50,10],
+    [50,50,50,50],
+    [10,50,100,200],
+    [200,100,50,10],
+]
 
-structure = [50,50,50]
+regularizers = ['l1','l2']
 
-model = Create_Model(structure, 0.000, 0.0, 'adagrad')
+reg_rates = [0, 0.05, 0.5, 1.5]
 
-model.summary()
+dropout_rates = [0, 0.05, 0.1, 0.5]
 
+epochs = [3]
 
+for structure in structures:
+    for regularizer in regularizers:
+        for reg_rate in reg_rates:
+            for dropout_rate in dropout_rates:
+                for epoch in epochs:
+                    print("\n---------------------------------------------------------")
+                    print("---------------------------------------------------------\n")
+                    print("structure:",structure,"\n")
+                    print("regularizer:",regularizer,"\n")
+                    print("reg_rate:",reg_rate,"\n")
+                    print("dropout_rate:",dropout_rate,"\n")
+                    print("epoch:",epoch,"\n")
+                    model = Create_Model(structure, regularizer, reg_rate, dropout_rate, 'adagrad')
+                    model.summary()
+                    history = model.fit(reduced_uni_train, Y_Train,
+                        validation_data=(reduced_uni_validation, Y_Validation),
+                        epochs=epoch,
+                        batch_size=128,
+                        callbacks=[metrics]
+                    )
+                    model.evaluate(reduced_uni_test, Y_Test)
 
-history = model.fit(reduced_uni_train, Y_Train, 
- validation_data=(reduced_uni_validation, Y_Validation),
- epochs=12,
- batch_size=128,
- callbacks=[metrics])
-
-model.evaluate(reduced_uni_test, Y_Test)
