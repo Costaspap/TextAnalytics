@@ -507,26 +507,58 @@ def Create_Model(structure, regularizer, reg_rate = 0, dropout_rate = 0, opt = '
 
 
 
+def plot_history_2(hs, epochs, metric, title):
+    plt.clf()
+    plt.rcParams['figure.figsize'] = [10, 5]
+    plt.rcParams['font.size'] = 16
+    for label in hs:
+        plt.plot(hs[label].history[metric], label='{0:s} train {1:s}'.format(label, metric))
+        plt.plot(hs[label].history['val_{0:s}'.format(metric)], label='{0:s} validation {1:s}'.format(label, metric))
+    x_ticks = np.arange(0, epochs+1)
+    #x_ticks [0] += 1
+    plt.title(title)
+    plt.xticks(x_ticks)
+#     plt.ylim((0, 1))
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss' if metric=='loss' else 'Accuracy')
+    plt.legend()
+    plt.show()
+
+
+
 insize = reduced_uni_train.shape[1]
 structures = [
     # [int(insize),int(np.round(insize/2,0)),int(np.round(insize/4,0))],
     # [int(np.round(insize/2,0)), int(np.round(insize / 10,0)), int(np.round(insize / 100,0))],
     # [int(np.round(insize / 10, 0)), int(np.round(insize / 100, 0)), int(np.round(insize / 1000, 0))],
     [50,50,50],
-    [10,50,100],
-    [100,50,10],
-    [50,50,50,50],
-    [10,50,100,200],
-    [200,100,50,10],
+#    [10,50,100],
+#    [100,50,10],
+#    [50,50,50,50],
+#    [10,50,100,200],
+#    [200,100,50,10],
 ]
 
-regularizers = ['l1','l2']
+regularizers =  [
+                    'l1',
+                    #'l2'
+                ]
 
-reg_rates = [0, 0.05, 0.5, 1.5]
+reg_rates = [
+#                0,
+                0.05,
+#                0.5,
+#                1.5
+            ]
 
-dropout_rates = [0, 0.05, 0.1, 0.5]
+dropout_rates = [
+#                    0,
+                    0.05,
+#                    0.1,
+#                    0.5
+                ]
 
-epochs = [3]
+epochs = [2]
 
 for structure in structures:
     for regularizer in regularizers:
@@ -549,4 +581,9 @@ for structure in structures:
                         callbacks=[metrics]
                     )
                     model.evaluate(reduced_uni_test, Y_Test)
+                    plot_history_2(hs={'MLP': history}, epochs=epoch, metric='loss', title=\
+                                "structure:" + str(structure) + ", regularizer:" + str(regularizer) +\
+                                ", reg_rate:" + str(reg_rate) + ",dropout_rate:" + str(dropout_rate) +\
+                                ",epoch:" + str(epoch)
+                    )
 
